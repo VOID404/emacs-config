@@ -25,6 +25,11 @@
   (straight-use-package 'evil-magit)
   (require 'evil-magit)
 #+END_SRC
+*** Auto Brackets
+#+BEGIN_SRC emacs-lisp
+  (straight-use-package 'autopair)
+  (autopair-global-mode)
+#+END_SRC
 ** Language support
 *** Auto completion
     #+BEGIN_SRC emacs-lisp
