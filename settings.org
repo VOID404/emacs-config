@@ -55,6 +55,21 @@
   (straight-use-package 'company)
   (add-hook 'after-init-hook 'global-company-mode)
     #+END_SRC
+*** REST client
+#+BEGIN_SRC emacs-lisp
+  (straight-use-package 'restclient)
+
+  (straight-use-package 'company-restclient)
+  (add-to-list 'company-backends 'company-restclient)
+
+  (straight-use-package 'ob-restclient)
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((restclient . t)))
+
+
+  (add-to-list 'auto-mode-alist '("\\.http\\'" . restclient-mode))
+#+END_SRC
 *** Flycheck
     #+BEGIN_SRC emacs-lisp
   (straight-use-package 'flycheck)
