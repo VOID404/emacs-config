@@ -1,0 +1,4 @@
+* VOID's Emacs configuration
+
+I'm comming from vim, after realizing that Emacs is objectively better, 
+hence my config uses evil mode and evil leader ([[https://github.com/noctuid/general.el][general]], to be precise).
