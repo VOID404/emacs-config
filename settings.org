@@ -15,21 +15,40 @@
   (setq org-src-window-setup 'current-window)
     #+END_SRC
 ** Utilities
-*** Ace window
+*** Projectile
 #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'ace-window)
+  (straight-use-package 'projectile)
+  (projectile-global-mode t)
+  (setq projectile-enable-caching t)
 #+END_SRC
+*** iflipb - stack based buffer switching
+    #+BEGIN_SRC emacs-lisp
+  (straight-use-package 'iflipb)
+  (defvar iflipb-wrap-around t)
+    #+END_SRC
+*** Ace jump buffer
+    #+BEGIN_SRC emacs-lisp
+  (straight-use-package 'ace-jump-buffer)
+    #+END_SRC
+*** Avy - char based decision tree
+    #+BEGIN_SRC emacs-lisp
+  (straight-use-package 'avy)
+    #+END_SRC
+*** Ace window
+    #+BEGIN_SRC emacs-lisp
+  (straight-use-package 'ace-window)
+    #+END_SRC
 *** Magit
-#+BEGIN_SRC emacs-lisp
+    #+BEGIN_SRC emacs-lisp
   (straight-use-package 'magit)
   (straight-use-package 'evil-magit)
   (require 'evil-magit)
-#+END_SRC
+    #+END_SRC
 *** Auto Brackets
-#+BEGIN_SRC emacs-lisp
+    #+BEGIN_SRC emacs-lisp
   (straight-use-package 'autopair)
   (autopair-global-mode)
-#+END_SRC
+    #+END_SRC
 ** Language support
 *** Auto completion
     #+BEGIN_SRC emacs-lisp
@@ -43,11 +62,12 @@
     #+END_SRC
 *** Ivy
     #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'ivy)
-  (straight-use-package 'swiper)
-  (straight-use-package 'counsel)
-  (straight-use-package 'counsel-projectile)
-  (counsel-mode 1)
+      (straight-use-package 'ivy)
+      (straight-use-package 'swiper)
+      (straight-use-package 'counsel)
+      (straight-use-package 'counsel-projectile)
+      (counsel-mode 1)
+      (setq ivy-extra-directories nil)
     #+END_SRC
 ** Global Behaviour
 *** Evil
@@ -154,7 +174,7 @@
      (forward-line -1)
      (org-edit-special))
     #+END_SRC
-*** Keybinding scripts
+*** New Buffer
     #+BEGIN_SRC emacs-lisp
    (defun new-empty-buffer ()
      "Create new empty buffer."
@@ -164,12 +184,17 @@
        (initial-major-mode)
        (setq buffer-offer-save t)
        buf ))
-
+   (show-paren-mode 1)
+    #+END_SRC
+*** Reload config
+    #+BEGIN_SRC emacs-lisp
    (defun reload-config ()
      "Reloads init.el."
      (interactive)
      (load-file "~/.emacs.d/init.el"))
-
+    #+END_SRC
+*** Reformat buffer
+    #+BEGIN_SRC emacs-lisp
    (defun reformat ()
      "Reformats whole file with evil."
      (interactive)
@@ -177,8 +202,17 @@
        (evil-goto-first-line)
        (evil-indent ((point-min) (point-max)))))
 
-   (show-paren-mode 1)
     #+END_SRC
+*** Kill other buffers
+#+BEGIN_SRC emacs-lisp
+  (defun kill-other-buffers ()
+    "Kill all buffers but the current one.
+  Don't mess with special buffers."
+    (interactive)
+    (dolist (buffer (buffer-list))
+      (unless (or (eql buffer (current-buffer)) (not (buffer-file-name buffer)))
+	(kill-buffer buffer))))
+#+END_SRC
 * Keybindings
   #+BEGIN_SRC emacs-lisp
     (straight-use-package 'general)
@@ -187,7 +221,7 @@
      :prefix "SPC"
      :non-normal-prefix "M-SPC"
      "" nil
-     "TAB" '(ido-switch-buffer :which-key "prev buffer")
+     "TAB" '(iflipb-next-buffer :which-key "prev buffer")
      "SPC" '(execute-extended-command :which-key "M-x")
      "c" '(:ignore t :which-key "comment")
 
@@ -202,11 +236,13 @@
      "ps" '(projectile-switch-project :which-key "switch")
 
      "b" '(:ignore t :which-key "buffer")
+     "bb" '(ace-jump-buffer :which-key "choose")
      "be" '(eval-buffer :which-key "eval")
      "bs" '(save-buffer :which-key "save")
      "bk" '(kill-buffer :which-key "kill")
      "bn" '(new-empty-buffer :which-key "new")
- 
+     "bK" '(kill-other-buffers :which-key "kill others")
+
      "t" '(:ignore t :which-key "toggles")
      "tm" '(minimap-mode :which-key "minimap")
      "tf" '(dired-sidebar-toggle-sidebar :which-key "files sidebar")
@@ -214,7 +250,7 @@
      "p" '(:ignore t :which-key "project")
      "pf" '(counsel-projectile-find-file :which-key "file")
      "pp" '(counsel-projectile-switch-project :which-key "open")
- 
+
      "w" '(:ignore t :which-key "window")
      "ww" '(ace-window :which-key "switch")
      "ws" '(ace-swap-window :which-key "swap")
