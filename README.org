@@ -2,3 +2,21 @@
 
 I'm comming from vim, after realizing that Emacs is objectively better, 
 hence my config uses evil mode and evil leader ([[https://github.com/noctuid/general.el][general]], to be precise).
+
+* Roadmap
+** Languages
+- Rust
+- GoLang
+- Scala
+- Python
+- Ruby
+- Kotlin
+** UI
+- Welcome screen
+- Line numbers font size fix
+** Service integration
+- Github
+- Bitbucket (?)
+- XMPP
+- Spotify
+- Slack
