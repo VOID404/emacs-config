@@ -1,0 +1,224 @@
+* Build-in options
+** UI
+   #+BEGIN_SRC emacs-lisp
+     (setq initial-scratch-message "")
+     (scroll-bar-mode 0)
+     (tool-bar-mode 0)
+     (menu-bar-mode 0)
+     (set-face-font 'default "Office Code Pro")
+     (set-face-attribute 'default nil :height 70)
+   #+END_SRC
+* Packages
+*** Org mode
+    #+BEGIN_SRC emacs-lisp
+  ;; Don't open new windows for src editing
+  (setq org-src-window-setup 'current-window)
+    #+END_SRC
+** Utilities
+*** Ace window
+#+BEGIN_SRC emacs-lisp
+  (straight-use-package 'ace-window)
+#+END_SRC
+*** Magit
+#+BEGIN_SRC emacs-lisp
+  (straight-use-package 'magit)
+  (straight-use-package 'evil-magit)
+  (require 'evil-magit)
+#+END_SRC
+** Language support
+*** Auto completion
+    #+BEGIN_SRC emacs-lisp
+  (straight-use-package 'company)
+  (add-hook 'after-init-hook 'global-company-mode)
+    #+END_SRC
+*** Flycheck
+    #+BEGIN_SRC emacs-lisp
+  (straight-use-package 'flycheck)
+  (global-flycheck-mode)
+    #+END_SRC
+*** Ivy
+    #+BEGIN_SRC emacs-lisp
+  (straight-use-package 'ivy)
+  (straight-use-package 'swiper)
+  (straight-use-package 'counsel)
+  (straight-use-package 'counsel-projectile)
+  (counsel-mode 1)
+    #+END_SRC
+** Global Behaviour
+*** Evil
+    #+BEGIN_SRC emacs-lisp
+  (straight-use-package 'evil)
+  (evil-mode 1)
+    #+END_SRC
+** UI
+*** Font Size
+    You have to set font size in [[Line number font fix]]
+*** Line number font fix
+    #+BEGIN_SRC emacs-lisp
+  ;; This script is set for a `text-scale-mode-step` of `1.04`
+  (setq text-scale-mode-step 1.04)
+  ;;
+  ;; List: `Sub-Zoom Font Heights per text-scale-mode-step`  
+  ;;   eg.  For a default font-height of 120 just remove the leading `160 150 140 130` 
+  (defvar sub-zoom-ht (list 110 100 100  90  80  80  80  80  70  70  60  60  50  50  50  40  40  40  30  20  20  20  20  20  20  10  10  10  10  10  10  10  10  10  10   5   5   5   5   5   2   2   2   2   2   2   2   2   1   1   1   1   1   1   1   1   1   1   1   1))
+  (defvar sub-zoom-len (safe-length sub-zoom-ht))
+  (defvar def-zoom-ht (car sub-zoom-ht))
+  (set-face-attribute 'default nil :height def-zoom-ht)
+
+  (defun text-scale-adjust-zAp ()
+     (interactive)
+     (text-scale-adjust 0)
+     (set-face-attribute 'linum nil :height def-zoom-ht)
+   )
+  (global-set-key [C-kp-multiply] 'text-scale-adjust-zAp)
+
+  (defun text-scale-decrease-zAp ()
+     (interactive)
+     (if (not (boundp 'text-scale-mode-amount)) ;; first-time init  
+		(setq  text-scale-mode-amount 0))
+     (setq text-scale (round (/ (* 1 text-scale-mode-amount) 
+				     text-scale-mode-step)))
+     (if (> text-scale (- 1 sub-zoom-len))
+	 (progn
+	   (text-scale-decrease text-scale-mode-step)
+	   (if (<= 0 text-scale-mode-amount)
+	       (set-face-attribute 'linum nil :height def-zoom-ht)
+	     (if (> 0 text-scale-mode-amount)
+		 (set-face-attribute 'linum nil :height 
+				       (elt sub-zoom-ht (- 0 text-scale)))))))
+  )
+  (global-set-key [C-kp-subtract] 'text-scale-decrease-zAp)
+
+  (defun text-scale-increase-zAp ()
+     (interactive)
+     (if (not (boundp 'text-scale-mode-amount)) ;; first-time init  
+		(setq  text-scale-mode-amount 0))
+     (setq text-scale (round (/ (* 1 text-scale-mode-amount) 
+				     text-scale-mode-step)))
+     (if (< text-scale 85)
+	 (progn
+	   (text-scale-increase text-scale-mode-step)
+	   (if (< (- 0 text-scale-mode-step) text-scale-mode-amount)
+	       (set-face-attribute 'linum nil :height def-zoom-ht)
+	     (if (> 0 text-scale-mode-amount)
+		 (set-face-attribute 'linum nil :height 
+				       (elt sub-zoom-ht (- 0 text-scale)))))))
+  )
+  (global-set-key [C-kp-add] 'text-scale-increase-zAp)
+
+
+  ;; Zoom font via Numeric Keypad
+  (global-set-key [C-kp-multiply] 'text-scale-adjust-zAp)
+  (global-set-key [C-kp-subtract] 'text-scale-decrease-zAp)
+  (global-set-key [C-kp-add]      'text-scale-increase-zAp)
+
+  ;; Zoomf font via Control Mouse Wheel
+  (global-set-key (kbd "<C-mouse-4>") 'text-scale-increase-zAp)
+  (global-set-key (kbd "<C-mouse-5>") 'text-scale-decrease-zAp)
+    #+END_SRC
+*** Relative line numbers
+    #+BEGIN_SRC emacs-lisp
+  (straight-use-package 'linum-relative)
+  (linum-relative-global-mode)
+  (defvar linum-relative-current-symbol)
+  (setq linum-relative-current-symbol "")
+    #+END_SRC
+*** Which key
+    #+BEGIN_SRC emacs-lisp
+  (straight-use-package 'which-key)
+  (which-key-mode 1)
+    #+END_SRC
+*** Minimap
+    #+BEGIN_SRC emacs-lisp
+  (straight-use-package 'minimap)
+  (defvar minimap-window-location)
+  (setq minimap-window-location 'right)
+    #+END_SRC
+*** Themes
+    #+BEGIN_SRC emacs-lisp
+  (straight-use-package 'dracula-theme)
+  (load-theme 'dracula t)
+    #+END_SRC
+* Scripts
+*** Codeblock function
+    #+BEGIN_SRC emacs-lisp
+   (defun lisp-block ()
+     "Insert 'org-mode' emacs lisp block."
+     (interactive)
+     (insert "#+BEGIN_SRC emacs-lisp\n\n#+END_SRC")
+     (forward-line -1)
+     (org-edit-special))
+    #+END_SRC
+*** Keybinding scripts
+    #+BEGIN_SRC emacs-lisp
+   (defun new-empty-buffer ()
+     "Create new empty buffer."
+     (interactive)
+     (let ((buf (generate-new-buffer "untitled")))
+       (switch-to-buffer buf)
+       (initial-major-mode)
+       (setq buffer-offer-save t)
+       buf ))
+
+   (defun reload-config ()
+     "Reloads init.el."
+     (interactive)
+     (load-file "~/.emacs.d/init.el"))
+
+   (defun reformat ()
+     "Reformats whole file with evil."
+     (interactive)
+     (let ((p (point)))
+       (evil-goto-first-line)
+       (evil-indent ((point-min) (point-max)))))
+
+   (show-paren-mode 1)
+    #+END_SRC
+* Keybindings
+  #+BEGIN_SRC emacs-lisp
+    (straight-use-package 'general)
+    (general-define-key
+     :states '(normal visual insert emacs motion)
+     :prefix "SPC"
+     :non-normal-prefix "M-SPC"
+     "" nil
+     "TAB" '(ido-switch-buffer :which-key "prev buffer")
+     "SPC" '(execute-extended-command :which-key "M-x")
+     "c" '(:ignore t :which-key "comment")
+
+     "f" '(:ignore t :which-key "file")
+     "fd" '(counsel-git :which-key "find in git dir")
+     "ff" '(counsel-find-file :which-key "open")
+     "fF" '(counsel-projectile-find-file :which-key "open")
+     "fe" '(:ignore t :which-key "emacs")
+     "fec" '(reload-config :which-key "reload config")
+
+     "p" '(:ignore t :which-key "project")
+     "ps" '(projectile-switch-project :which-key "switch")
+
+     "b" '(:ignore t :which-key "buffer")
+     "be" '(eval-buffer :which-key "eval")
+     "bs" '(save-buffer :which-key "save")
+     "bk" '(kill-buffer :which-key "kill")
+     "bn" '(new-empty-buffer :which-key "new")
+ 
+     "t" '(:ignore t :which-key "toggles")
+     "tm" '(minimap-mode :which-key "minimap")
+     "tf" '(dired-sidebar-toggle-sidebar :which-key "files sidebar")
+
+     "p" '(:ignore t :which-key "project")
+     "pf" '(counsel-projectile-find-file :which-key "file")
+     "pp" '(counsel-projectile-switch-project :which-key "open")
+ 
+     "w" '(:ignore t :which-key "window")
+     "ww" '(ace-window :which-key "switch")
+     "ws" '(ace-swap-window :which-key "swap")
+     "wk" '(delete-window :which-key "kill")
+     "w/" '(split-window-right :which-key "split right")
+     "w-" '(split-window-below :which-key "split below")
+     "wf" '(delete-other-windows :which-key "fullscreen")
+
+     "g" '(:ignore t :which-key "git")
+     "gs" '(magit-status :which-key "magit")
+    )
+  #+END_SRC
