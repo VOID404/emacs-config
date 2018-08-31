@@ -1,13 +1,20 @@
 * Build-in options
 ** UI
-   #+BEGIN_SRC emacs-lisp
+*** Font
+    #+BEGIN_SRC emacs-lisp
+     (set-face-attribute 'default nil :height 110)
+     (set-face-font 'default "Office Code Pro")
+    #+END_SRC
+*** Initial scratch 
+    #+BEGIN_SRC emacs-lisp
      (setq initial-scratch-message "")
+    #+END_SRC
+*** Borderless
+    #+BEGIN_SRC emacs-lisp
      (scroll-bar-mode 0)
      (tool-bar-mode 0)
      (menu-bar-mode 0)
-     (set-face-font 'default "Office Code Pro")
-     (set-face-attribute 'default nil :height 70)
-   #+END_SRC
+    #+END_SRC
 * Packages
 *** Org mode
     #+BEGIN_SRC emacs-lisp
@@ -16,11 +23,11 @@
     #+END_SRC
 ** Utilities
 *** Projectile
-#+BEGIN_SRC emacs-lisp
+    #+BEGIN_SRC emacs-lisp
   (straight-use-package 'projectile)
   (projectile-global-mode t)
   (setq projectile-enable-caching t)
-#+END_SRC
+    #+END_SRC
 *** iflipb - stack based buffer switching
     #+BEGIN_SRC emacs-lisp
   (straight-use-package 'iflipb)
@@ -53,12 +60,12 @@
 *** Auto completion
     #+BEGIN_SRC emacs-lisp
   (straight-use-package 'company)
+  (require 'company)
   (add-hook 'after-init-hook 'global-company-mode)
     #+END_SRC
 *** REST client
-#+BEGIN_SRC emacs-lisp
+    #+BEGIN_SRC emacs-lisp
   (straight-use-package 'restclient)
-
   (straight-use-package 'company-restclient)
   (add-to-list 'company-backends 'company-restclient)
 
@@ -69,7 +76,7 @@
 
 
   (add-to-list 'auto-mode-alist '("\\.http\\'" . restclient-mode))
-#+END_SRC
+    #+END_SRC
 *** Flycheck
     #+BEGIN_SRC emacs-lisp
   (straight-use-package 'flycheck)
@@ -91,70 +98,20 @@
   (evil-mode 1)
     #+END_SRC
 ** UI
-*** Font Size
-    You have to set font size in [[Line number font fix]]
-*** Line number font fix
+*** Modeline
     #+BEGIN_SRC emacs-lisp
-  ;; This script is set for a `text-scale-mode-step` of `1.04`
-  (setq text-scale-mode-step 1.04)
-  ;;
-  ;; List: `Sub-Zoom Font Heights per text-scale-mode-step`  
-  ;;   eg.  For a default font-height of 120 just remove the leading `160 150 140 130` 
-  (defvar sub-zoom-ht (list 110 100 100  90  80  80  80  80  70  70  60  60  50  50  50  40  40  40  30  20  20  20  20  20  20  10  10  10  10  10  10  10  10  10  10   5   5   5   5   5   2   2   2   2   2   2   2   2   1   1   1   1   1   1   1   1   1   1   1   1))
-  (defvar sub-zoom-len (safe-length sub-zoom-ht))
-  (defvar def-zoom-ht (car sub-zoom-ht))
-  (set-face-attribute 'default nil :height def-zoom-ht)
-
-  (defun text-scale-adjust-zAp ()
-     (interactive)
-     (text-scale-adjust 0)
-     (set-face-attribute 'linum nil :height def-zoom-ht)
-   )
-  (global-set-key [C-kp-multiply] 'text-scale-adjust-zAp)
-
-  (defun text-scale-decrease-zAp ()
-     (interactive)
-     (if (not (boundp 'text-scale-mode-amount)) ;; first-time init  
-		(setq  text-scale-mode-amount 0))
-     (setq text-scale (round (/ (* 1 text-scale-mode-amount) 
-				     text-scale-mode-step)))
-     (if (> text-scale (- 1 sub-zoom-len))
-	 (progn
-	   (text-scale-decrease text-scale-mode-step)
-	   (if (<= 0 text-scale-mode-amount)
-	       (set-face-attribute 'linum nil :height def-zoom-ht)
-	     (if (> 0 text-scale-mode-amount)
-		 (set-face-attribute 'linum nil :height 
-				       (elt sub-zoom-ht (- 0 text-scale)))))))
-  )
-  (global-set-key [C-kp-subtract] 'text-scale-decrease-zAp)
-
-  (defun text-scale-increase-zAp ()
-     (interactive)
-     (if (not (boundp 'text-scale-mode-amount)) ;; first-time init  
-		(setq  text-scale-mode-amount 0))
-     (setq text-scale (round (/ (* 1 text-scale-mode-amount) 
-				     text-scale-mode-step)))
-     (if (< text-scale 85)
-	 (progn
-	   (text-scale-increase text-scale-mode-step)
-	   (if (< (- 0 text-scale-mode-step) text-scale-mode-amount)
-	       (set-face-attribute 'linum nil :height def-zoom-ht)
-	     (if (> 0 text-scale-mode-amount)
-		 (set-face-attribute 'linum nil :height 
-				       (elt sub-zoom-ht (- 0 text-scale)))))))
-  )
-  (global-set-key [C-kp-add] 'text-scale-increase-zAp)
-
-
-  ;; Zoom font via Numeric Keypad
-  (global-set-key [C-kp-multiply] 'text-scale-adjust-zAp)
-  (global-set-key [C-kp-subtract] 'text-scale-decrease-zAp)
-  (global-set-key [C-kp-add]      'text-scale-increase-zAp)
-
-  ;; Zoomf font via Control Mouse Wheel
-  (global-set-key (kbd "<C-mouse-4>") 'text-scale-increase-zAp)
-  (global-set-key (kbd "<C-mouse-5>") 'text-scale-decrease-zAp)
+      (straight-use-package 'spaceline)
+      (straight-use-package 'winum)
+      (require 'spaceline-config)
+      (spaceline-emacs-theme)
+      (setq winum-auto-setup-mode-line nil)
+      (winum-mode)
+    #+END_SRC
+*** Neotree
+    #+BEGIN_SRC emacs-lisp
+  (straight-use-package 'neotree)
+  (require 'neotree)
+  (global-set-key [f8] 'neotree-toggle)
     #+END_SRC
 *** Relative line numbers
     #+BEGIN_SRC emacs-lisp
@@ -176,8 +133,9 @@
     #+END_SRC
 *** Themes
     #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'dracula-theme)
-  (load-theme 'dracula t)
+      (straight-use-package 'dracula-theme)
+      (straight-use-package 'base16-theme)
+      (load-theme 'base16-pico t)
     #+END_SRC
 * Scripts
 *** Codeblock function
@@ -219,7 +177,7 @@
 
     #+END_SRC
 *** Kill other buffers
-#+BEGIN_SRC emacs-lisp
+    #+BEGIN_SRC emacs-lisp
   (defun kill-other-buffers ()
     "Kill all buffers but the current one.
   Don't mess with special buffers."
@@ -227,7 +185,7 @@
     (dolist (buffer (buffer-list))
       (unless (or (eql buffer (current-buffer)) (not (buffer-file-name buffer)))
 	(kill-buffer buffer))))
-#+END_SRC
+    #+END_SRC
 * Keybindings
   #+BEGIN_SRC emacs-lisp
     (straight-use-package 'general)
