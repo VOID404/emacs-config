@@ -22,6 +22,10 @@
   (setq org-src-window-setup 'current-window)
     #+END_SRC
 ** Utilities
+*** Sudo edit
+#+BEGIN_SRC emacs-lisp
+  (straight-use-package 'sudo-edit)
+#+END_SRC
 *** Projectile
     #+BEGIN_SRC emacs-lisp
   (straight-use-package 'projectile)
@@ -77,6 +81,22 @@
 
   (add-to-list 'auto-mode-alist '("\\.http\\'" . restclient-mode))
     #+END_SRC
+*** Dockerfile
+#+BEGIN_SRC emacs-lisp
+  (straight-use-package 'dockerfile-mode)
+#+END_SRC
+*** JSX
+#+BEGIN_SRC emacs-lisp
+  (straight-use-package 'rjsx-mode)
+  (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
+  (add-to-list 'auto-mode-alist '("\\.jsx\\'" . rjsx-mode))
+  (add-to-list 'auto-mode-alist '("App\\.jsx?\\'" . rjsx-mode))
+#+END_SRC
+*** Scala
+#+BEGIN_SRC emacs-lisp
+  (straight-use-package 'ensime)
+  (setq ensime-startup-notification nil)
+#+END_SRC
 *** Flycheck
     #+BEGIN_SRC emacs-lisp
   (straight-use-package 'flycheck)
