@@ -155,7 +155,7 @@
     #+BEGIN_SRC emacs-lisp
       (straight-use-package 'dracula-theme)
       (straight-use-package 'base16-theme)
-      (load-theme 'base16-pico t)
+      (load-theme 'base16-atelier-forest t)
     #+END_SRC
 * Scripts
 *** Codeblock function
