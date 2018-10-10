@@ -1,6 +1,6 @@
 *
 !.gitignore
+!Cask
 !init.el
 !settings.org
-!straight/versions/default.el
 !README.org
