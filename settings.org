@@ -1,162 +1,110 @@
-* Build-in options
-** UI
-*** Font
-    #+BEGIN_SRC emacs-lisp
-     (set-face-attribute 'default nil :height 110)
-     (set-face-font 'default "Office Code Pro")
-    #+END_SRC
-*** Initial scratch 
-    #+BEGIN_SRC emacs-lisp
-     (setq initial-scratch-message "")
-    #+END_SRC
-*** Borderless
-    #+BEGIN_SRC emacs-lisp
-     (scroll-bar-mode 0)
-     (tool-bar-mode 0)
-     (menu-bar-mode 0)
-    #+END_SRC
-* Packages
-*** Org mode
-    #+BEGIN_SRC emacs-lisp
-  ;; Don't open new windows for src editing
-  (setq org-src-window-setup 'current-window)
-    #+END_SRC
-** Utilities
-*** Sudo edit
-#+BEGIN_SRC emacs-lisp
-  (straight-use-package 'sudo-edit)
-#+END_SRC
-*** Projectile
-    #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'projectile)
-  (projectile-global-mode t)
-  (setq projectile-enable-caching t)
-    #+END_SRC
-*** iflipb - stack based buffer switching
-    #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'iflipb)
-  (defvar iflipb-wrap-around t)
-    #+END_SRC
-*** Ace jump buffer
-    #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'ace-jump-buffer)
-    #+END_SRC
-*** Avy - char based decision tree
-    #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'avy)
-    #+END_SRC
-*** Ace window
-    #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'ace-window)
-    #+END_SRC
-*** Magit
-    #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'magit)
-  (straight-use-package 'evil-magit)
-  (require 'evil-magit)
-    #+END_SRC
-*** Auto Brackets
-    #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'autopair)
-  (autopair-global-mode)
-    #+END_SRC
-** Language support
-*** Auto completion
-    #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'company)
-  (require 'company)
-  (add-hook 'after-init-hook 'global-company-mode)
-    #+END_SRC
-*** REST client
-    #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'restclient)
-  (straight-use-package 'company-restclient)
-  (add-to-list 'company-backends 'company-restclient)
+* UI
+** Font
+   #+BEGIN_SRC emacs-lisp
+    (set-face-attribute 'default nil :height 200)
+    (set-face-font 'default "Office Code Pro D")
+   #+END_SRC
+** Initial scratch 
+   #+BEGIN_SRC emacs-lisp
+    (setq initial-scratch-message "")
+   #+END_SRC
+** Borderless
+   #+BEGIN_SRC emacs-lisp
+    (scroll-bar-mode 0)
+    (tool-bar-mode 0)
+    (menu-bar-mode 0)
+   #+END_SRC
+* Org mode
+  #+BEGIN_SRC emacs-lisp
+;; Don't open new windows for src editing
+(setq org-src-window-setup 'current-window)
+  #+END_SRC
+* Utilities
+** Projectile
+   #+BEGIN_SRC emacs-lisp
+ (projectile-global-mode t)
+ (setq projectile-enable-caching t)
+   #+END_SRC
+** iflipb - stack based buffer switching
+   #+BEGIN_SRC emacs-lisp
+ (defvar iflipb-wrap-around t)
+   #+END_SRC
+** Magit
+   #+BEGIN_SRC emacs-lisp
+ (require 'evil-magit)
+   #+END_SRC
+** Auto Brackets
+   #+BEGIN_SRC emacs-lisp
+ (autopair-global-mode)
+   #+END_SRC
+* Language support
+** Auto completion
+   #+BEGIN_SRC emacs-lisp
+ (require 'company)
+ (add-hook 'after-init-hook 'global-company-mode)
+   #+END_SRC
+** REST client
+   #+BEGIN_SRC emacs-lisp
+ (add-to-list 'company-backends 'company-restclient)
 
-  (straight-use-package 'ob-restclient)
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((restclient . t)))
+ (org-babel-do-load-languages
+  'org-babel-load-languages
+  '((restclient . t)))
 
 
-  (add-to-list 'auto-mode-alist '("\\.http\\'" . restclient-mode))
-    #+END_SRC
-*** Dockerfile
-#+BEGIN_SRC emacs-lisp
-  (straight-use-package 'dockerfile-mode)
-#+END_SRC
-*** JSX
-#+BEGIN_SRC emacs-lisp
-  (straight-use-package 'rjsx-mode)
+ (add-to-list 'auto-mode-alist '("\\.http\\'" . restclient-mode))
+   #+END_SRC
+** JSX
+   #+BEGIN_SRC emacs-lisp
   (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
   (add-to-list 'auto-mode-alist '("\\.jsx\\'" . rjsx-mode))
   (add-to-list 'auto-mode-alist '("App\\.jsx?\\'" . rjsx-mode))
-#+END_SRC
-*** Scala
-#+BEGIN_SRC emacs-lisp
-  (straight-use-package 'ensime)
+   #+END_SRC
+** Scala
+   #+BEGIN_SRC emacs-lisp
   (setq ensime-startup-notification nil)
-#+END_SRC
-*** Flycheck
-    #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'flycheck)
-  (global-flycheck-mode)
-    #+END_SRC
-*** Ivy
-    #+BEGIN_SRC emacs-lisp
-      (straight-use-package 'ivy)
-      (straight-use-package 'swiper)
-      (straight-use-package 'counsel)
-      (straight-use-package 'counsel-projectile)
-      (counsel-mode 1)
-      (setq ivy-extra-directories nil)
-    #+END_SRC
-** Global Behaviour
-*** Evil
-    #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'evil)
-  (evil-mode 1)
-    #+END_SRC
-** UI
-*** Modeline
-    #+BEGIN_SRC emacs-lisp
-      (straight-use-package 'spaceline)
-      (straight-use-package 'winum)
-      (require 'spaceline-config)
-      (spaceline-emacs-theme)
-      (setq winum-auto-setup-mode-line nil)
-      (winum-mode)
-    #+END_SRC
-*** Neotree
-    #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'neotree)
-  (require 'neotree)
-  (global-set-key [f8] 'neotree-toggle)
-    #+END_SRC
-*** Relative line numbers
-    #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'linum-relative)
-  (linum-relative-global-mode)
-  (defvar linum-relative-current-symbol)
-  (setq linum-relative-current-symbol "")
-    #+END_SRC
-*** Which key
-    #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'which-key)
-  (which-key-mode 1)
-    #+END_SRC
-*** Minimap
-    #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'minimap)
-  (defvar minimap-window-location)
-  (setq minimap-window-location 'right)
-    #+END_SRC
-*** Themes
-    #+BEGIN_SRC emacs-lisp
-      (straight-use-package 'dracula-theme)
-      (straight-use-package 'base16-theme)
-      (load-theme 'base16-atelier-forest t)
-    #+END_SRC
+   #+END_SRC
+** Flycheck
+   #+BEGIN_SRC emacs-lisp
+ (global-flycheck-mode)
+   #+END_SRC
+** Ivy
+   #+BEGIN_SRC emacs-lisp
+     (counsel-mode 1)
+     (setq ivy-extra-directories nil)
+   #+END_SRC
+* UI
+** Modeline
+   #+BEGIN_SRC emacs-lisp
+     (require 'spaceline-config)
+     (spaceline-emacs-theme)
+     (setq winum-auto-setup-mode-line nil)
+     (winum-mode)
+   #+END_SRC
+** Neotree
+   #+BEGIN_SRC emacs-lisp
+ (require 'neotree)
+ (global-set-key [f8] 'neotree-toggle)
+   #+END_SRC
+** Relative line numbers
+   #+BEGIN_SRC emacs-lisp
+ (linum-relative-global-mode)
+ (defvar linum-relative-current-symbol)
+ (setq linum-relative-current-symbol "")
+   #+END_SRC
+** Which key
+   #+BEGIN_SRC emacs-lisp
+ (which-key-mode 1)
+   #+END_SRC
+** Minimap
+   #+BEGIN_SRC emacs-lisp
+ (defvar minimap-window-location)
+ (setq minimap-window-location 'right)
+   #+END_SRC
+** Themes
+   #+BEGIN_SRC emacs-lisp
+     (load-theme 'base16-atelier-forest t)
+   #+END_SRC
 * Scripts
 *** Codeblock function
     #+BEGIN_SRC emacs-lisp
@@ -208,7 +156,6 @@
     #+END_SRC
 * Keybindings
   #+BEGIN_SRC emacs-lisp
-    (straight-use-package 'general)
     (general-define-key
      :states '(normal visual insert emacs motion)
      :prefix "SPC"
