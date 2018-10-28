@@ -16,9 +16,14 @@
    #+END_SRC
 * Org mode
   #+BEGIN_SRC emacs-lisp
-;; Don't open new windows for src editing
-(setq org-src-window-setup 'current-window)
+    ;; Don't open new windows for src editing
+    (setq org-src-window-setup 'current-window)
   #+END_SRC
+** Presentations
+   #+BEGIN_SRC emacs-lisp
+  (require 'ox-reveal)
+  (setq org-reveal-root "http://cdn.jsdelivr.net/reveal.js/3.0.0/")
+   #+END_SRC
 * Utilities
 ** Projectile
    #+BEGIN_SRC emacs-lisp
@@ -35,7 +40,7 @@
    #+END_SRC
 ** Auto Brackets
    #+BEGIN_SRC emacs-lisp
- (autopair-global-mode)
+ (autopair-global-mode 1)
    #+END_SRC
 * Language support
 ** Auto completion
@@ -45,14 +50,14 @@
    #+END_SRC
 ** REST client
    #+BEGIN_SRC emacs-lisp
- (add-to-list 'company-backends 'company-restclient)
+     (add-to-list 'company-backends 'company-restclient)
 
- (org-babel-do-load-languages
-  'org-babel-load-languages
-  '((restclient . t)))
+     (org-babel-do-load-languages
+      'org-babel-load-languages
+      '((restclient . t)))
 
 
- (add-to-list 'auto-mode-alist '("\\.http\\'" . restclient-mode))
+     (add-to-list 'auto-mode-alist '("\\.http\\'" . restclient-mode))
    #+END_SRC
 ** JSX
    #+BEGIN_SRC emacs-lisp
@@ -72,6 +77,18 @@
    #+BEGIN_SRC emacs-lisp
      (counsel-mode 1)
      (setq ivy-extra-directories nil)
+   #+END_SRC
+** Cask
+   #+BEGIN_SRC emacs-lisp
+     (add-to-list 'auto-mode-alist '("Cask" . lisp-mode))
+   #+END_SRC
+** Rust
+   #+BEGIN_SRC emacs-lisp
+  (with-eval-after-load 'rust-mode
+    (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+   #+END_SRC
+** Clojure
+   #+BEGIN_SRC emacs-lisp
    #+END_SRC
 * UI
 ** Modeline

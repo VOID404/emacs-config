@@ -1,5 +1,6 @@
 (source gnu)
 (source melpa)
+(source org)
 
 (depends-on "bind-key")
 (depends-on "cask")
@@ -26,8 +27,15 @@
 (depends-on "web-mode")
 (depends-on "yasnippet")
 
-(depends-on "evil")
+;; Languages
 (depends-on "org")
+(depends-on "restclient")
+(depends-on "ob-restclient")
+(depends-on "company-restclient")
+(depends-on "dockerfile-mode")
+(depends-on "rjsx-mode")
+
+(depends-on "evil")
 (depends-on "sudo-edit")
 (depends-on "projectile")
 (depends-on "iflipb")
@@ -38,12 +46,6 @@
 (depends-on "evil-magit")
 (depends-on "autopair")
 (depends-on "company")
-(depends-on "restclient")
-(depends-on "company-restclient")
-(depends-on "ob-restclient")
-
-(depends-on "dockerfile-mode")
-(depends-on "rjsx-mode")
 (depends-on "ensime")
 (depends-on "flycheck")
 (depends-on "ivy")
@@ -56,8 +58,25 @@
 (depends-on "linum-relative")
 (depends-on "which-key")
 (depends-on "minimap")
+(depends-on "general")
+
+;; YAML
+(depends-on "yaml-mode")
+
+;; Rust lang
+(depends-on "rust-mode")
+(depends-on "flycheck-rust")
+(depends-on "racer")
+(depends-on "rust-snippets" :git "https://github.com/freebroccolo/rust-snippets.git")
+
+;; clojure
+(depends-on "cider")
+
+;; Presentation
+(depends-on "ox-reveal")
+
+;; Themes
 (depends-on "dracula-theme")
 (depends-on "base16-theme")
-(depends-on "general")
 
 (package "void config" "0.1.0" "void's config for emacs")
