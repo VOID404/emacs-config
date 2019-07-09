@@ -2,8 +2,8 @@
 ** UI
 *** Font
     #+BEGIN_SRC emacs-lisp
-     (set-face-attribute 'default nil :height 110)
-     (set-face-font 'default "Office Code Pro")
+     (set-face-attribute 'default nil :height 170)
+     (set-face-font 'default "Input")
     #+END_SRC
 *** Initial scratch 
     #+BEGIN_SRC emacs-lisp
@@ -23,9 +23,9 @@
     #+END_SRC
 ** Utilities
 *** Sudo edit
-#+BEGIN_SRC emacs-lisp
+    #+BEGIN_SRC emacs-lisp
   (straight-use-package 'sudo-edit)
-#+END_SRC
+    #+END_SRC
 *** Projectile
     #+BEGIN_SRC emacs-lisp
   (straight-use-package 'projectile)
@@ -82,21 +82,21 @@
   (add-to-list 'auto-mode-alist '("\\.http\\'" . restclient-mode))
     #+END_SRC
 *** Dockerfile
-#+BEGIN_SRC emacs-lisp
+    #+BEGIN_SRC emacs-lisp
   (straight-use-package 'dockerfile-mode)
-#+END_SRC
+    #+END_SRC
 *** JSX
-#+BEGIN_SRC emacs-lisp
+    #+BEGIN_SRC emacs-lisp
   (straight-use-package 'rjsx-mode)
   (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
   (add-to-list 'auto-mode-alist '("\\.jsx\\'" . rjsx-mode))
   (add-to-list 'auto-mode-alist '("App\\.jsx?\\'" . rjsx-mode))
-#+END_SRC
+    #+END_SRC
 *** Scala
-#+BEGIN_SRC emacs-lisp
+    #+BEGIN_SRC emacs-lisp
   (straight-use-package 'ensime)
   (setq ensime-startup-notification nil)
-#+END_SRC
+    #+END_SRC
 *** Flycheck
     #+BEGIN_SRC emacs-lisp
   (straight-use-package 'flycheck)
@@ -129,10 +129,35 @@
     #+END_SRC
 *** Neotree
     #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'neotree)
-  (require 'neotree)
-  (global-set-key [f8] 'neotree-toggle)
-    #+END_SRC
+      (straight-use-package 'neotree)
+      (straight-use-package 'all-the-icons)
+
+      (setq neo-theme 'icons )
+
+      (defun toggle-neotree ()
+	(interactive)
+	(if (eq major-mode 'neotree-mode) 
+	    (windmove-right) 
+	    (neotree-show)))
+	
+	(setq neo-autorefresh t)
+	(setq neo-smart-open t)
+
+	(global-set-key (kbd "M-0") 'toggle-neotree)
+
+	(evil-define-key 'normal neotree-mode-map (kbd "TAB") 'neotree-enter)
+	(evil-define-key 'normal neotree-mode-map (kbd "SPC") 'neotree-quick-look)
+	(evil-define-key 'normal neotree-mode-map (kbd "q") 'neotree-hide)
+	(evil-define-key 'normal neotree-mode-map (kbd "RET") 'neotree-enter)
+	(evil-define-key 'normal neotree-mode-map (kbd "g") 'neotree-refresh)
+	(evil-define-key 'normal neotree-mode-map (kbd "n") 'neotree-next-line)
+	(evil-define-key 'normal neotree-mode-map (kbd "p") 'neotree-previous-line)
+	(evil-define-key 'normal neotree-mode-map (kbd "A") 'neotree-stretch-toggle)
+	(evil-define-key 'normal neotree-mode-map (kbd "H") 'neotree-hidden-file-toggle)
+	(evil-define-key 'normal neotree-mode-map (kbd "H") 'neotree-hidden-file-toggle)
+	(evil-define-key 'normal neotree-mode-map (kbd "c") 'neotree-create-node)
+      #+END_SRC
+
 *** Relative line numbers
     #+BEGIN_SRC emacs-lisp
   (straight-use-package 'linum-relative)
@@ -155,8 +180,14 @@
     #+BEGIN_SRC emacs-lisp
       (straight-use-package 'dracula-theme)
       (straight-use-package 'base16-theme)
-      (load-theme 'base16-atelier-forest t)
+      (straight-use-package 'cyberpunk-theme)
+      ;; (load-theme 'base16-atelier-forest t)
+      (load-theme 'cyberpunk t)
     #+END_SRC
+
+    #+RESULTS:
+    : t
+
 * Scripts
 *** Codeblock function
     #+BEGIN_SRC emacs-lisp
@@ -219,6 +250,7 @@
      "c" '(:ignore t :which-key "comment")
 
      "f" '(:ignore t :which-key "file")
+     "ft" '(neotree-toggle :whick-key "toggle neotree")
      "fd" '(counsel-git :which-key "find in git dir")
      "ff" '(counsel-find-file :which-key "open")
      "fF" '(counsel-projectile-find-file :which-key "open")
@@ -256,3 +288,4 @@
      "gs" '(magit-status :which-key "magit")
     )
   #+END_SRC
+  
