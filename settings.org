@@ -2,7 +2,7 @@
 ** UI
 *** Font
     #+BEGIN_SRC emacs-lisp
-     (set-face-attribute 'default nil :height 170)
+     (set-face-attribute 'default nil :height 120)
      (set-face-font 'default "Input")
     #+END_SRC
 *** Initial scratch 
@@ -63,9 +63,9 @@
 ** Language support
 *** Auto completion
     #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'company)
-  (require 'company)
-  (add-hook 'after-init-hook 'global-company-mode)
+      (straight-use-package 'company)
+      (require 'company)
+      (add-hook 'after-init-hook 'global-company-mode)
     #+END_SRC
 *** REST client
     #+BEGIN_SRC emacs-lisp
@@ -110,7 +110,7 @@
       (setq geiser-active-implementations '(chez))
       (straight-use-package 'geiser)
 
-      #+END_SRC
+    #+END_SRC
 *** Golang
     #+BEGIN_SRC emacs-lisp
       ;;; (straight-use-package 'go-mode)
@@ -119,14 +119,28 @@
        '(el-patch :type git :host github :repo "dominikh/go-mode.el"))
       (straight-use-package 'go-eldoc)
       (straight-use-package 'company-go)
-      ;;(require 'go-mode)
+      (require 'go-eldoc)
       (add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
+
       (add-hook 'go-mode-hook 'go-eldoc-setup)
       (add-hook 'go-mode-hook 
 		'(lambda ()
+		   (setq gofmt-command "goimports")
+		   (add-hook 'before-save-hook 'gofmt-before-save)
 		   (set (make-local-variable 'company-backends)
 			'((company-dabbrev-code company-go)))))
       #+END_SRC
+*** Rust
+#+BEGIN_SRC emacs-lisp
+  (straight-use-package 'rust-mode)
+
+  (setq rust-format-on-save t)
+  (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
+#+END_SRC
+*** Arduino
+    #+BEGIN_SRC emacs-lisp
+  (straight-use-package 'arduino-mode)
+    #+END_SRC
 *** Flycheck
     #+BEGIN_SRC emacs-lisp
   (straight-use-package 'flycheck)
@@ -162,31 +176,44 @@
       (straight-use-package 'neotree)
       (straight-use-package 'all-the-icons)
 
-      (setq neo-theme 'icons )
+      (setq neo-theme 'asci)
 
       (defun toggle-neotree ()
 	(interactive)
 	(if (eq major-mode 'neotree-mode) 
 	    (windmove-right) 
-	    (neotree-show)))
-	
-	(setq neo-autorefresh t)
-	(setq neo-smart-open t)
+	  (neotree-show)))
 
-	(global-set-key (kbd "M-0") 'toggle-neotree)
+      (defun neotree-project-dir ()
+	"Open NeoTree using the git root."
+	(interactive)
+	(let ((project-dir (projectile-project-root))
+	      (file-name (buffer-file-name)))
+	  (neotree-toggle)
+	  (if project-dir
+	      (if (neo-global--window-exists-p)
+		  (progn
+		    (neotree-dir project-dir)
+		    (neotree-find file-name)))
+	    (message "Could not find git project root."))))
 
-	(evil-define-key 'normal neotree-mode-map (kbd "TAB") 'neotree-enter)
-	(evil-define-key 'normal neotree-mode-map (kbd "SPC") 'neotree-quick-look)
-	(evil-define-key 'normal neotree-mode-map (kbd "q") 'neotree-hide)
-	(evil-define-key 'normal neotree-mode-map (kbd "RET") 'neotree-enter)
-	(evil-define-key 'normal neotree-mode-map (kbd "g") 'neotree-refresh)
-	(evil-define-key 'normal neotree-mode-map (kbd "n") 'neotree-next-line)
-	(evil-define-key 'normal neotree-mode-map (kbd "p") 'neotree-previous-line)
-	(evil-define-key 'normal neotree-mode-map (kbd "A") 'neotree-stretch-toggle)
-	(evil-define-key 'normal neotree-mode-map (kbd "H") 'neotree-hidden-file-toggle)
-	(evil-define-key 'normal neotree-mode-map (kbd "H") 'neotree-hidden-file-toggle)
-	(evil-define-key 'normal neotree-mode-map (kbd "c") 'neotree-create-node)
-      #+END_SRC
+      ;;; (setq neo-autorefresh t)
+      (setq neo-smart-open t)
+
+      (global-set-key (kbd "M-0") 'toggle-neotree)
+
+      (evil-define-key 'normal neotree-mode-map (kbd "TAB") 'neotree-enter)
+      (evil-define-key 'normal neotree-mode-map (kbd "SPC") 'neotree-quick-look)
+      (evil-define-key 'normal neotree-mode-map (kbd "q") 'neotree-hide)
+      (evil-define-key 'normal neotree-mode-map (kbd "RET") 'neotree-enter)
+      (evil-define-key 'normal neotree-mode-map (kbd "g") 'neotree-refresh)
+      (evil-define-key 'normal neotree-mode-map (kbd "n") 'neotree-next-line)
+      (evil-define-key 'normal neotree-mode-map (kbd "p") 'neotree-previous-line)
+      (evil-define-key 'normal neotree-mode-map (kbd "A") 'neotree-stretch-toggle)
+      (evil-define-key 'normal neotree-mode-map (kbd "H") 'neotree-hidden-file-toggle)
+      (evil-define-key 'normal neotree-mode-map (kbd "H") 'neotree-hidden-file-toggle)
+      (evil-define-key 'normal neotree-mode-map (kbd "c") 'neotree-create-node)
+    #+END_SRC
 
 *** Relative line numbers
     #+BEGIN_SRC emacs-lisp
@@ -277,10 +304,12 @@
      "" nil
      "TAB" '(iflipb-next-buffer :which-key "prev buffer")
      "SPC" '(execute-extended-command :which-key "M-x")
-     "c" '(:ignore t :which-key "comment")
+
+     "/" '(comment-line :which-key "comment")
 
      "f" '(:ignore t :which-key "file")
-     "ft" '(neotree-toggle :whick-key "toggle neotree")
+     "ft" '(neotree-toggle :which-key "toggle neotree")
+     "fr" '(neotree-project-dir :which-key "toggle neotree with projectile")
      "fd" '(counsel-git :which-key "find in git dir")
      "ff" '(counsel-find-file :which-key "open")
      "fF" '(counsel-projectile-find-file :which-key "open")
@@ -315,7 +344,13 @@
      "wf" '(delete-other-windows :which-key "fullscreen")
 
      "g" '(:ignore t :which-key "git")
-     "gs" '(magit-status :which-key "magit")
-    )
+     "gs" '(magit-status :which-key "magit"))
+
+    (general-define-key 
+     :keymaps 'go-mode-map
+     :states '(normal)
+     "g" '(:ignore t :which-key "Go to")
+     "gd" '(go-guru-definition :which-key "definition")
+     "gD" '(go-guru-definition-other-window :which-key "definition (other win)"))
   #+END_SRC
   
