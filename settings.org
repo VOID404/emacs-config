@@ -243,9 +243,8 @@
 		    (neotree-find file-name)))
 	    (message "Could not find git project root."))))
 
-      ;;; (setq neo-autorefresh t)
-      (setq neo-smart-open nil)
       (setq neo-autorefresh nil)
+      (setq neo-smart-open nil)
 
       (global-set-key (kbd "M-0") 'toggle-neotree)
 
