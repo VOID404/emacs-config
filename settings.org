@@ -3,7 +3,7 @@
 *** Font
     #+BEGIN_SRC emacs-lisp
      (set-face-attribute 'default nil :height 120)
-     (set-face-font 'default "Hasklig")
+     (set-face-font 'default "Fira Code")
     #+END_SRC
 *** Initial scratch 
     #+BEGIN_SRC emacs-lisp
