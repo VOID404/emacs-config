@@ -3,7 +3,7 @@
 *** Font
     #+BEGIN_SRC emacs-lisp
      (set-face-attribute 'default nil :height 120)
-     (set-face-font 'default "Input")
+     (set-face-font 'default "Hasklig")
     #+END_SRC
 *** Initial scratch 
     #+BEGIN_SRC emacs-lisp
@@ -106,10 +106,47 @@
     #+END_SRC
 *** Scheme
     #+BEGIN_SRC emacs-lisp
-      (setq geiser-mode-smart-tab-p t)
-      (setq geiser-active-implementations '(chez))
       (straight-use-package 'geiser)
 
+      (setq geiser-mode-smart-tab-p t)
+      (setq geiser-active-implementations '(chez))
+
+      (setq kwds
+	    '(("(\\(\\w+\\)" . font-lock-function-name-face)
+	      ("Pi\\|Infinity" . font-lock-constant-face)))
+
+      (define-minor-mode blah-mode
+	"Doc string."
+	nil "blah" nil
+	(font-lock-add-keywords nil kwds)
+
+	(if (fboundp 'font-lock-flush)
+	    (font-lock-flush)
+	  (when font-lock-mode
+	    (with-no-warnings (font-lock-fontify-buffer)))))
+
+
+
+      (add-hook 'scheme-mode-hook
+		(lambda ()
+		  (setq prettify-symbols-alist
+			(append '(("lambda"  . ?λ)
+				  ("remove" . ?∉)
+				  ("'()" . ?∅)
+				  ("cons" . ∷))
+				prettify-symbols-alist))))
+
+    #+END_SRC
+*** Clojure
+    #+BEGIN_SRC emacs-lisp
+      (straight-use-package 'cider)
+    #+END_SRC
+*** Common Lisp (Slime)
+    #+BEGIN_SRC emacs-lisp
+      (straight-use-package 'slime)
+
+      (setq inferior-lisp-program "/usr/bin/ccl")
+      (setq slime-contribs '(slime-fancy))
     #+END_SRC
 *** Golang
     #+BEGIN_SRC emacs-lisp
@@ -129,14 +166,14 @@
 		   (add-hook 'before-save-hook 'gofmt-before-save)
 		   (set (make-local-variable 'company-backends)
 			'((company-dabbrev-code company-go)))))
-      #+END_SRC
+    #+END_SRC
 *** Rust
-#+BEGIN_SRC emacs-lisp
+    #+BEGIN_SRC emacs-lisp
   (straight-use-package 'rust-mode)
 
   (setq rust-format-on-save t)
   (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
-#+END_SRC
+    #+END_SRC
 *** Arduino
     #+BEGIN_SRC emacs-lisp
   (straight-use-package 'arduino-mode)
@@ -164,19 +201,28 @@
 ** UI
 *** Modeline
     #+BEGIN_SRC emacs-lisp
-      (straight-use-package 'spaceline)
+      (straight-use-package 'doom-modeline)
       (straight-use-package 'winum)
-      (require 'spaceline-config)
-      (spaceline-emacs-theme)
-      (setq winum-auto-setup-mode-line nil)
+
+      (display-battery-mode)
       (winum-mode)
+      (doom-modeline-mode)
+
+      (setq doom-modeline-minor-modes (featurep 'minions))
+
+      (add-hook 'buffer-selection-menu-hook (lambda () (setq mode-line-format nil)))
+
+      (custom-set-faces
+	 '(mode-line ((t (:height 0.9))))
+	 '(mode-line-inactive ((t (:height 0.9)))))
+      (setq doom-modeline-height 1)
     #+END_SRC
 *** Neotree
     #+BEGIN_SRC emacs-lisp
       (straight-use-package 'neotree)
       (straight-use-package 'all-the-icons)
 
-      (setq neo-theme 'asci)
+      (setq neo-theme (if (display-graphic-p) 'icons 'ascii))
 
       (defun toggle-neotree ()
 	(interactive)
@@ -198,7 +244,8 @@
 	    (message "Could not find git project root."))))
 
       ;;; (setq neo-autorefresh t)
-      (setq neo-smart-open t)
+      (setq neo-smart-open nil)
+      (setq neo-autorefresh nil)
 
       (global-set-key (kbd "M-0") 'toggle-neotree)
 
@@ -297,13 +344,16 @@
 * Keybindings
   #+BEGIN_SRC emacs-lisp
     (straight-use-package 'general)
+    (general-define-key)
+    ;;"M-x" 'helm-M-x)
+
     (general-define-key
      :states '(normal visual insert emacs motion)
      :prefix "SPC"
      :non-normal-prefix "M-SPC"
      "" nil
      "TAB" '(iflipb-next-buffer :which-key "prev buffer")
-     "SPC" '(execute-extended-command :which-key "M-x")
+     "SPC" '(counsel-M-x :which-key "M-x")
 
      "/" '(comment-line :which-key "comment")
 
