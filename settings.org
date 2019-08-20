@@ -15,6 +15,34 @@
      (tool-bar-mode 0)
      (menu-bar-mode 0)
     #+END_SRC
+*** Line Numbers
+    #+BEGIN_SRC emacs-lisp
+      (global-display-line-numbers-mode)
+      (setq display-line-numbers 'relative)
+    #+END_SRC
+*** Modeline
+    #+BEGIN_SRC emacs-lisp
+      (defun simple-mode-line-render (left right)
+	"Return a string of `window-width' length containing LEFT, and RIGHT
+	     aligned respectively."
+	(let* ((available-width (- (window-width) (length left) 2)))
+	  (format (format " %%s %%%ds " available-width) left right)))
+
+
+      (setq-default battery-mode-line-format "[%b%p%%%%  %t]")
+      (setq-default display-time-format "%H:%M")
+
+      (display-time-mode)
+      (display-battery-mode)
+
+      (setq-default mode-line-format
+		    '(:eval (simple-mode-line-render
+			     ;; left
+			     (format-mode-line "%b [%m] [%*] (%l ; %c)")
+			     ;; right
+			     (concat (substring-no-properties display-time-string 0 -4)
+				     battery-mode-line-string))))
+    #+END_SRC
 * Packages
 *** Org mode
     #+BEGIN_SRC emacs-lisp
@@ -200,22 +228,13 @@
     #+END_SRC
 ** UI
 *** Modeline
-    #+BEGIN_SRC emacs-lisp
-      (straight-use-package 'doom-modeline)
-      (straight-use-package 'winum)
-
+    #+BEGIN_SRC emacs-lisp-asd
+      (straight-use-package 'smart-mode-line)
+      (straight-use-package 'minions)
+      (minions-mode 1)
       (display-battery-mode)
-      (winum-mode)
-      (doom-modeline-mode)
-
-      (setq doom-modeline-minor-modes (featurep 'minions))
-
-      (add-hook 'buffer-selection-menu-hook (lambda () (setq mode-line-format nil)))
-
-      (custom-set-faces
-	 '(mode-line ((t (:height 0.9))))
-	 '(mode-line-inactive ((t (:height 0.9)))))
-      (setq doom-modeline-height 1)
+      (setq sml/theme 'dark)
+      (sml/setup)
     #+END_SRC
 *** Neotree
     #+BEGIN_SRC emacs-lisp
@@ -261,13 +280,6 @@
       (evil-define-key 'normal neotree-mode-map (kbd "c") 'neotree-create-node)
     #+END_SRC
 
-*** Relative line numbers
-    #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'linum-relative)
-  (linum-relative-global-mode)
-  (defvar linum-relative-current-symbol)
-  (setq linum-relative-current-symbol "")
-    #+END_SRC
 *** Which key
     #+BEGIN_SRC emacs-lisp
   (straight-use-package 'which-key)
@@ -299,7 +311,7 @@
      (interactive)
      (insert "#+BEGIN_SRC emacs-lisp\n\n#+END_SRC")
      (forward-line -1)
-     (org-edit-special))
+     '(org-edit-special))
     #+END_SRC
 *** New Buffer
     #+BEGIN_SRC emacs-lisp
