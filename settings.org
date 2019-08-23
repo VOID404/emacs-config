@@ -222,6 +222,13 @@
     #+BEGIN_SRC emacs-lisp
   (straight-use-package 'arduino-mode)
     #+END_SRC
+*** REST
+    #+BEGIN_SRC emacs-lisp
+      (straight-use-package 'restclient)
+
+      (when (string-equal system-type "darwin")
+	(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
+    #+END_SRC
 *** Flycheck
     #+BEGIN_SRC emacs-lisp
   (straight-use-package 'flycheck)
