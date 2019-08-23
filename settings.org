@@ -48,10 +48,18 @@
 * Packages
 *** Org mode
     #+BEGIN_SRC emacs-lisp
-  ;; Don't open new windows for src editing
-  (setq org-src-window-setup 'current-window)
+      ;; Don't open new windows for src editing
+      (setq org-src-window-setup 'current-window)
+
+      (straight-use-package 'ox-gfm)
+      (straight-use-package 'toc-org)
+      (add-hook 'org-mode-hook 'toc-org-mode)
     #+END_SRC
 ** Utilities
+*** Transpose frame
+    #+BEGIN_SRC emacs-lisp
+      (straight-use-package 'transpose-frame)
+    #+END_SRC
 *** Sudo edit
     #+BEGIN_SRC emacs-lisp
   (straight-use-package 'sudo-edit)
@@ -82,8 +90,10 @@
 *** Magit
     #+BEGIN_SRC emacs-lisp
       (straight-use-package 'magit)
-      ;;; (straight-use-package 'evil-magit)
-      ;;; (require 'evil-magit)
+      (straight-use-package 'evil-magit)
+      (require 'evil-magit)
+
+      (defalias 'magit-diff-visit-file 'magit-diff-visit-file-other-window)
     #+END_SRC
 *** Auto Brackets
     #+BEGIN_SRC emacs-lisp
@@ -270,6 +280,7 @@
 
       (setq neo-autorefresh nil)
       (setq neo-smart-open nil)
+      (setq neo-window-fixed-size nil)
 
       (global-set-key (kbd "M-0") 'toggle-neotree)
 
