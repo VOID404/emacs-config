@@ -20,31 +20,6 @@
       (global-display-line-numbers-mode)
       (setq display-line-numbers 'relative)
     #+END_SRC
-*** Modeline
-    #+BEGIN_SRC emacs-lisp
-      (defun simple-mode-line-render (left right)
-	"Return a string of `window-width' length containing LEFT, and RIGHT
-		   aligned respectively."
-	(let* ((available-width (- (window-width) (length left) 2)))
-	  (format (format " %%s %%%ds " available-width) left right)))
-
-
-      (setq-default battery-mode-line-format "[%b%p%%%%  %t]")
-      (setq-default display-time-default-load-average nil)
-      (setq-default display-time-format "%H:%M")
-
-      (display-time-mode)
-      (display-battery-mode)
-
-      (setq-default mode-line-format
-		    '(:eval (simple-mode-line-render
-			     ;; left
-			     (format-mode-line "%b [%m] [%*] (%l ; %c)")
-			     ;; right
-			     (concat  display-time-string
-				      "  "
-				      battery-mode-line-string))))
-    #+END_SRC
 * Packages
 *** Org mode
     #+BEGIN_SRC emacs-lisp
@@ -81,7 +56,9 @@
     #+END_SRC
 *** Avy - char based decision tree
     #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'avy)
+      (straight-use-package 'avy)
+
+      (global-set-key (kbd "C-l") 'avy-goto-line)
     #+END_SRC
 *** Ace window
     #+BEGIN_SRC emacs-lisp
@@ -103,6 +80,20 @@
 *** Ranger
     #+BEGIN_SRC emacs-lisp
       (straight-use-package 'ranger)
+    #+END_SRC
+*** Multiple cursors
+    #+BEGIN_SRC emacs-lisp
+      (straight-use-package 'evil-multiedit)
+      ;; (global-evil-mc-mode  1)
+    #+END_SRC
+*** Speedreading - spray
+    #+BEGIN_SRC emacs-lisp
+      (straight-use-package 'spray)
+      (global-set-key (kbd "<f6>") 'spray-mode)
+    #+END_SRC
+*** Better help
+    #+BEGIN_SRC emacs-lisp
+      (straight-use-package 'helpful)
     #+END_SRC
 ** Language support
 *** Auto completion
@@ -197,7 +188,7 @@
       ;;; (straight-use-package 'go-mode)
 
       (straight-use-package
-       '(el-patch :type git :host github :repo "dominikh/go-mode.el"))
+       '(go-mode :type git :host github :repo "dominikh/go-mode.el"))
       (straight-use-package 'go-eldoc)
       (straight-use-package 'company-go)
       (require 'go-eldoc)
@@ -250,14 +241,24 @@
   (evil-mode 1)
     #+END_SRC
 ** UI
+*** Tabs
+    #+BEGIN_SRC emacs-lisp
+      (straight-use-package 
+       '(awesome-tab :type git :host github :repo "manateelazycat/awesome-tab"))
+      (global-set-key (kbd "C-<left>") 'awesome-tab-backward-tab)
+      (global-set-key (kbd "C-<right>") 'awesome-tab-forward-tab)
+    #+END_SRC
 *** Modeline
-    #+BEGIN_SRC emacs-lisp-asd
-      (straight-use-package 'smart-mode-line)
-      (straight-use-package 'minions)
-      (minions-mode 1)
+    #+BEGIN_SRC emacs-lisp
+      (straight-use-package 'doom-modeline)
       (display-battery-mode)
-      (setq sml/theme 'dark)
-      (sml/setup)
+      (setq-default battery-mode-line-format "[%b%p%%  %t] ")
+      (setq-default display-time-default-load-average nil)
+      (setq-default display-time-format "%H:%M")
+
+      (display-time-mode)
+      (display-battery-mode)
+      (doom-modeline-mode 1)
     #+END_SRC
 *** Neotree
     #+BEGIN_SRC emacs-lisp
@@ -406,7 +407,7 @@
      "ps" '(projectile-switch-project :which-key "switch")
 
      "b" '(:ignore t :which-key "buffer")
-     "bb" '(ace-jump-buffer :which-key "choose")
+     "bb" '(counsel-ibuffer :which-key "choose")
      "be" '(eval-buffer :which-key "eval")
      "bs" '(save-buffer :which-key "save")
      "bk" '(kill-buffer :which-key "kill")
