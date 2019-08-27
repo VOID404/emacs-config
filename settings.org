@@ -1,443 +1,271 @@
-* Build-in options
-** UI
-*** Font
-    #+BEGIN_SRC emacs-lisp
-     (set-face-attribute 'default nil :height 120)
-     (set-face-font 'default "Fira Code")
-    #+END_SRC
-*** Initial scratch 
-    #+BEGIN_SRC emacs-lisp
-     (setq initial-scratch-message "")
-    #+END_SRC
-*** Borderless
-    #+BEGIN_SRC emacs-lisp
-     (scroll-bar-mode 0)
-     (tool-bar-mode 0)
-     (menu-bar-mode 0)
-    #+END_SRC
-*** Line Numbers
-    #+BEGIN_SRC emacs-lisp
-      (global-display-line-numbers-mode)
-      (setq display-line-numbers 'relative)
-    #+END_SRC
-* Packages
-*** Org mode
-    #+BEGIN_SRC emacs-lisp
-      ;; Don't open new windows for src editing
-      (setq org-src-window-setup 'current-window)
+* UI
+** All the icons
+   #+BEGIN_SRC emacs-lisp
+     (use-package all-the-icons
+       :straight t)
+   #+END_SRC
 
-      (straight-use-package 'ox-gfm)
-      (straight-use-package 'toc-org)
-      (add-hook 'org-mode-hook 'toc-org-mode)
-    #+END_SRC
-** Utilities
-*** Transpose frame
-    #+BEGIN_SRC emacs-lisp
-      (straight-use-package 'transpose-frame)
-    #+END_SRC
-*** Sudo edit
-    #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'sudo-edit)
-    #+END_SRC
-*** Projectile
-    #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'projectile)
-  (projectile-global-mode t)
-  (setq projectile-enable-caching t)
-    #+END_SRC
-*** iflipb - stack based buffer switching
-    #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'iflipb)
-  (defvar iflipb-wrap-around t)
-    #+END_SRC
-*** Ace jump buffer
-    #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'ace-jump-buffer)
-    #+END_SRC
-*** Avy - char based decision tree
-    #+BEGIN_SRC emacs-lisp
-      (straight-use-package 'avy)
+** Modeline
+   #+BEGIN_SRC emacs-lisp
+     (use-package doom-modeline
+       :straight t
+       :init
+       (setq-default battery-mode-line-format "[%b%p%%  %t] ")
+       (setq-default display-time-default-load-average nil)
+       (setq-default display-time-format "%H:%M")
+       :config
+       (display-battery-mode)
+       (display-time-mode)
+       (doom-modeline-mode 1))
+   #+END_SRC
 
-      (global-set-key (kbd "C-l") 'avy-goto-line)
-    #+END_SRC
-*** Ace window
-    #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'ace-window)
-    #+END_SRC
-*** Magit
-    #+BEGIN_SRC emacs-lisp
-      (straight-use-package 'magit)
-      (straight-use-package 'evil-magit)
-      (require 'evil-magit)
+** Which key
+   #+BEGIN_SRC emacs-lisp
+     (use-package which-key
+       :straight t
+       :config
+       (which-key-mode 1))
+   #+END_SRC
 
-      (defalias 'magit-diff-visit-file 'magit-diff-visit-file-other-window)
-    #+END_SRC
-*** Auto Brackets
-    #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'autopair)
-  (autopair-global-mode)
-    #+END_SRC
-*** Ranger
-    #+BEGIN_SRC emacs-lisp
-      (straight-use-package 'ranger)
-    #+END_SRC
-*** Multiple cursors
-    #+BEGIN_SRC emacs-lisp
-      (straight-use-package 'evil-multiedit)
-      ;; (global-evil-mc-mode  1)
-    #+END_SRC
-*** Speedreading - spray
-    #+BEGIN_SRC emacs-lisp
-      (straight-use-package 'spray)
-      (global-set-key (kbd "<f6>") 'spray-mode)
-    #+END_SRC
-*** Better help
-    #+BEGIN_SRC emacs-lisp
-      (straight-use-package 'helpful)
-    #+END_SRC
-** Language support
-*** Auto completion
-    #+BEGIN_SRC emacs-lisp
-      (straight-use-package 'company)
-      (require 'company)
-      (add-hook 'after-init-hook 'global-company-mode)
-    #+END_SRC
-*** REST client
-    #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'restclient)
-  (straight-use-package 'company-restclient)
-  (add-to-list 'company-backends 'company-restclient)
+** Themes
+   #+BEGIN_SRC emacs-lisp
+     (use-package dracula-theme
+       :straight t
+       :defer t)
 
-  (straight-use-package 'ob-restclient)
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((restclient . t)))
+     (use-package base16-theme
+       :straight t
+       :defer t)
 
+     (use-package cyberpunk-theme
+       :straight t
+       :defer t)
 
-  (add-to-list 'auto-mode-alist '("\\.http\\'" . restclient-mode))
-    #+END_SRC
-*** Dockerfile
-    #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'dockerfile-mode)
-    #+END_SRC
-*** JSX
-    #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'rjsx-mode)
-  (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
-  (add-to-list 'auto-mode-alist '("\\.jsx\\'" . rjsx-mode))
-  (add-to-list 'auto-mode-alist '("App\\.jsx?\\'" . rjsx-mode))
-    #+END_SRC
-*** Scala
-    #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'ensime)
-  (setq ensime-startup-notification nil)
-    #+END_SRC
-*** Docker
-    #+BEGIN_SRC emacs-lisp
-      (straight-use-package 'yaml-mode)
-      (straight-use-package 'docker)
-      (straight-use-package 'dockerfile-mode)
-      (add-to-list 'auto-mode-alist '("Dockerfile\\'" . dockerfile-mode))
-    #+END_SRC
-*** Scheme
-    #+BEGIN_SRC emacs-lisp
-      (straight-use-package 'geiser)
+     (load-theme 'cyberpunk t)
+   #+END_SRC
 
-      (setq geiser-mode-smart-tab-p t)
-      (setq geiser-active-implementations '(chez))
+** Treemacs
+   #+BEGIN_SRC emacs-lisp
+     (use-package treemacs
+       :straight t
+       :bind ("C-c f" . treemacs-select-window))
+     (use-package treemacs-magit
+       :straight t
+       :after treemacs)
+   #+END_SRC
 
-      (setq kwds
-	    '(("(\\(\\w+\\)" . font-lock-function-name-face)
-	      ("Pi\\|Infinity" . font-lock-constant-face)))
+* Utils
+** Hydra
+   #+BEGIN_SRC emacs-lisp
+     (use-package hydra
+       :straight t)
+     (use-package pretty-hydra
+       :straight t)
+     (use-package major-mode-hydra
+       :straight t
+       :defer nil
+       :bind
+       ("M-SPC" . major-mode-hydra))
+   #+END_SRC
 
-      (define-minor-mode blah-mode
-	"Doc string."
-	nil "blah" nil
-	(font-lock-add-keywords nil kwds)
+** Ranger
+   #+BEGIN_SRC emacs-lisp
+     (use-package ranger
+       :straight t
+       :commands ranger
+       :bind ("C-c r" . ranger))
+   #+END_SRC
 
-	(if (fboundp 'font-lock-flush)
-	    (font-lock-flush)
-	  (when font-lock-mode
-	    (with-no-warnings (font-lock-fontify-buffer)))))
+** Auto Brackets
+   #+BEGIN_SRC emacs-lisp
+     (show-paren-mode)
+     (use-package autopair
+       :straight t
+       :config
+       (autopair-global-mode))
+   #+END_SRC
 
+** Transpose frame
+   #+BEGIN_SRC emacs-lisp
+     (use-package transpose-frame
+       :straight t
+       :pretty-hydra
+       ((:color red :quit-key "q")
+	("Transpose"
+	 (("h" flop-frame "horizontal")
+	  ("v" flip-frame "vertical")
+	  ("r" rotate-frame-clockwise "rotate 90")
+	  ("R" rotate-frame-clockwise "rotate 180"))))
+       :bind ("C-c t" . transpose-frame-hydra/body))
+   #+END_SRC
 
+** Ivy
+   #+BEGIN_SRC emacs-lisp
+     (use-package ivy
+       :straight t
+       :config
+       (ivy-mode 1))
 
-      (add-hook 'scheme-mode-hook
-		(lambda ()
-		  (setq prettify-symbols-alist
-			(append '(("lambda"  . ?λ)
-				  ("remove" . ?∉)
-				  ("'()" . ?∅)
-				  ("cons" . ∷))
-				prettify-symbols-alist))))
+     (use-package all-the-icons-ivy
+       :straight t
+       :after (ivy all-the-icons)
+       :config
+       (all-the-icons-ivy-setup))
 
-    #+END_SRC
-*** Clojure
-    #+BEGIN_SRC emacs-lisp
-      (straight-use-package 'cider)
-    #+END_SRC
-*** Common Lisp (Slime)
-    #+BEGIN_SRC emacs-lisp
-      (straight-use-package 'slime)
+     (use-package counsel
+       :straight t
+       :after ivy
+       :bind (("M-x" . counsel-M-x)
+	      ("C-s" . swiper-isearch)
+	      ("C-x C-f" . counsel-find-file)
+	      ("C-c w" . hydra-window/body)))
 
-      (setq inferior-lisp-program "/usr/bin/ccl")
-      (setq slime-contribs '(slime-fancy))
-    #+END_SRC
-*** Golang
-    #+BEGIN_SRC emacs-lisp
-      ;;; (straight-use-package 'go-mode)
+     (use-package ace-window
+       :straight t)
 
-      (straight-use-package
-       '(go-mode :type git :host github :repo "dominikh/go-mode.el"))
-      (straight-use-package 'go-eldoc)
-      (straight-use-package 'company-go)
-      (require 'go-eldoc)
-      (add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
+     (pretty-hydra-define hydra-window
+			  (:color amaranth :quit-key "q")
+			  ("Buffer"
+			   (("," previous-buffer "previous")
+			    ("." next-buffer "next")
+			    ("bb" counsel-ibuffer "jump buffer")
+			    ("c" crux-create-scratch-buffer "scratch")
+			    ("k" kill-current-buffer "kill"))
+			   "Window"
+			   (("ww" ace-window "switch")
+			    ("s" ace-swap-window "swap")
+			    ("v" split-window-below "split below")
+			    ("h" split-window-right "wplit right")
+			    ("wk" delete-window "kill")
+			    ("f" delete-other-windows "fullscreen"))))
+   #+END_SRC
 
-      (add-hook 'go-mode-hook 'go-eldoc-setup)
-      (add-hook 'go-mode-hook 
-		'(lambda ()
-		   (setq gofmt-command "goimports")
-		   (add-hook 'before-save-hook 'gofmt-before-save)
-		   (set (make-local-variable 'company-backends)
-			'((company-dabbrev-code company-go)))))
-    #+END_SRC
-*** Rust
-    #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'rust-mode)
+** Magit
+   #+BEGIN_SRC emacs-lisp
+     (use-package magit
+       :straight t
+       :config
+       (defalias 'magit-diff-visit-file 'magit-diff-visit-file-other-window)
+       :pretty-hydra
+       ((:color teal :quit-key "q")
+	("View"
+	 (("s" magit-status "status")
+	  ("l" magit-log-all-branches "log"))
+	 "Do"
+	 (("p" magit-push "push")
+	  ("z" magit-stash "stash"))))
+       :bind ("C-c g" . magit-hydra/body))
+   #+END_SRC
 
-  (setq rust-format-on-save t)
-  (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
-    #+END_SRC
-*** Arduino
-    #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'arduino-mode)
-    #+END_SRC
-*** REST
-    #+BEGIN_SRC emacs-lisp
-      (straight-use-package 'restclient)
+** Crux
+   #+BEGIN_SRC emacs-lisp
+     (use-package crux
+       :straight t
+       :bind (("C-k" . crux-smart-kill-line)
+	      ("C-a" . crux-move-beginning-of-line)))
+   #+END_SRC
 
-      (when (string-equal system-type "darwin")
-	(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
-    #+END_SRC
-*** Flycheck
-    #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'flycheck)
-  (global-flycheck-mode)
-    #+END_SRC
-*** Ivy
-    #+BEGIN_SRC emacs-lisp
-      (straight-use-package 'ivy)
-      (straight-use-package 'swiper)
-      (straight-use-package 'counsel)
-      (straight-use-package 'counsel-projectile)
-      (counsel-mode 1)
-      (setq ivy-extra-directories nil)
-    #+END_SRC
-** Global Behaviour
-*** Evil
-    #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'evil)
-  (evil-mode 1)
-    #+END_SRC
-** UI
-*** Tabs
-    #+BEGIN_SRC emacs-lisp
-      (straight-use-package 
-       '(awesome-tab :type git :host github :repo "manateelazycat/awesome-tab"))
-      (global-set-key (kbd "C-<left>") 'awesome-tab-backward-tab)
-      (global-set-key (kbd "C-<right>") 'awesome-tab-forward-tab)
-    #+END_SRC
-*** Modeline
-    #+BEGIN_SRC emacs-lisp
-      (straight-use-package 'doom-modeline)
-      (display-battery-mode)
-      (setq-default battery-mode-line-format "[%b%p%%  %t] ")
-      (setq-default display-time-default-load-average nil)
-      (setq-default display-time-format "%H:%M")
+** Helpful
+** Multiple Cursors
+   #+BEGIN_SRC emacs-lisp
+     (use-package multiple-cursors
+       :straight t
+       :bind ("C-d" . hydra-multiple-cursors/body))
 
-      (display-time-mode)
-      (display-battery-mode)
-      (doom-modeline-mode 1)
-    #+END_SRC
-*** Neotree
-    #+BEGIN_SRC emacs-lisp
-      (straight-use-package 'neotree)
-      (straight-use-package 'all-the-icons)
+     (defhydra hydra-multiple-cursors (:hint nil)
+       "
+      Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cursor%s(if (> (mc/num-cursors) 1) \"s\" \"\")
+     ------------------------------------------------------------------
+      [_p_]   Next     [_n_]   Next     [_l_] Edit lines  [_0_] Insert numbers
+      [_P_]   Skip     [_N_]   Skip     [_a_] Mark all    [_A_] Insert letters
+      [_M-p_] Unmark   [_M-n_] Unmark   [_s_] Search
+      [Click] Cursor at point       [_q_] Quit"
+       ("l" mc/edit-lines :exit t)
+       ("a" mc/mark-all-like-this :exit t)
+       ("n" mc/mark-next-like-this)
+       ("N" mc/skip-to-next-like-this)
+       ("M-n" mc/unmark-next-like-this)
+       ("p" mc/mark-previous-like-this)
+       ("P" mc/skip-to-previous-like-this)
+       ("M-p" mc/unmark-previous-like-this)
+       ("s" mc/mark-all-in-region-regexp :exit t)
+       ("0" mc/insert-numbers :exit t)
+       ("A" mc/insert-letters :exit t)
+       ("<mouse-1>" mc/add-cursor-on-click)
+       ;; Help with click recognition in this hydra
+       ("<down-mouse-1>" ignore)
+       ("<drag-mouse-1>" ignore)
+       ("q" nil :color blue))
+   #+END_SRC
 
-      (setq neo-theme (if (display-graphic-p) 'icons 'ascii))
+* Language Support
+** General completion
+   #+BEGIN_SRC emacs-lisp
+     (use-package company
+       :hook (after-init-hook . global-company-mode))
+   #+END_SRC
 
-      (defun toggle-neotree ()
-	(interactive)
-	(if (eq major-mode 'neotree-mode) 
-	    (windmove-right) 
-	  (neotree-show)))
+** Go
+   #+BEGIN_SRC emacs-lisp
+     (use-package go-mode
+       :straight t
+       :mode "\\.go\\'"
+       :hook (go-mode .
+		      (lambda ()
+			(message "debug")
+			(setq gofmt-command "goimports")
+			(add-hook 'before-save-hook 'gofmt-before-save)
+			(set (make-local-variable 'company-backends)
+			     '((company-dabbrev-code company-go)))))
+       :config
+       (major-mode-hydra-define go-mode
+	 (:color pink :quit-key "q")
+	 ("Goto"
+	  (("gd" godef-jump "definition")
+	   ("gD" godef-jump-other-window "definition (other window)")))))
 
-      (defun neotree-project-dir ()
-	"Open NeoTree using the git root."
-	(interactive)
-	(let ((project-dir (projectile-project-root))
-	      (file-name (buffer-file-name)))
-	  (neotree-toggle)
-	  (if project-dir
-	      (if (neo-global--window-exists-p)
-		  (progn
-		    (neotree-dir project-dir)
-		    (neotree-find file-name)))
-	    (message "Could not find git project root."))))
+     (use-package go-eldoc
+       :after go-mode
+       :hook (go-mode . go-eldoc-setup))
 
-      (setq neo-autorefresh nil)
-      (setq neo-smart-open nil)
-      (setq neo-window-fixed-size nil)
+     (use-package company-go
+       :after go-mode)
+   #+END_SRC
 
-      (global-set-key (kbd "M-0") 'toggle-neotree)
+** Dockerfile
+   #+BEGIN_SRC emacs-lisp
+     (use-package dockerfile-mode
+       :straight t
+       :mode "\\^Dockerfile\\'")
+   #+END_SRC
 
-      (evil-define-key 'normal neotree-mode-map (kbd "TAB") 'neotree-enter)
-      (evil-define-key 'normal neotree-mode-map (kbd "SPC") 'neotree-quick-look)
-      (evil-define-key 'normal neotree-mode-map (kbd "q") 'neotree-hide)
-      (evil-define-key 'normal neotree-mode-map (kbd "RET") 'neotree-enter)
-      (evil-define-key 'normal neotree-mode-map (kbd "g") 'neotree-refresh)
-      (evil-define-key 'normal neotree-mode-map (kbd "n") 'neotree-next-line)
-      (evil-define-key 'normal neotree-mode-map (kbd "p") 'neotree-previous-line)
-      (evil-define-key 'normal neotree-mode-map (kbd "A") 'neotree-stretch-toggle)
-      (evil-define-key 'normal neotree-mode-map (kbd "H") 'neotree-hidden-file-toggle)
-      (evil-define-key 'normal neotree-mode-map (kbd "H") 'neotree-hidden-file-toggle)
-      (evil-define-key 'normal neotree-mode-map (kbd "c") 'neotree-create-node)
-    #+END_SRC
-
-*** Which key
-    #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'which-key)
-  (which-key-mode 1)
-    #+END_SRC
-*** Minimap
-    #+BEGIN_SRC emacs-lisp
-  (straight-use-package 'minimap)
-  (defvar minimap-window-location)
-  (setq minimap-window-location 'right)
-    #+END_SRC
-*** Themes
-    #+BEGIN_SRC emacs-lisp
-      (straight-use-package 'dracula-theme)
-      (straight-use-package 'base16-theme)
-      (straight-use-package 'cyberpunk-theme)
-      ;; (load-theme 'base16-atelier-forest t)
-      (load-theme 'cyberpunk t)
-    #+END_SRC
-
-    #+RESULTS:
-    : t
+** Yaml
+   #+BEGIN_SRC emacs-lisp
+     (use-package yaml-mode
+       :straight t
+       :mode "\\.ya?ml\\'")
+   #+END_SRC
 
 * Scripts
-*** Codeblock function
-    #+BEGIN_SRC emacs-lisp
-   (defun lisp-block ()
-     "Insert 'org-mode' emacs lisp block."
-     (interactive)
-     (insert "#+BEGIN_SRC emacs-lisp\n\n#+END_SRC")
-     (forward-line -1)
-     '(org-edit-special))
-    #+END_SRC
-*** New Buffer
-    #+BEGIN_SRC emacs-lisp
-   (defun new-empty-buffer ()
-     "Create new empty buffer."
-     (interactive)
-     (let ((buf (generate-new-buffer "untitled")))
-       (switch-to-buffer buf)
-       (initial-major-mode)
-       (setq buffer-offer-save t)
-       buf ))
-   (show-paren-mode 1)
-    #+END_SRC
-*** Reload config
-    #+BEGIN_SRC emacs-lisp
-   (defun reload-config ()
-     "Reloads init.el."
-     (interactive)
-     (load-file "~/.emacs.d/init.el"))
-    #+END_SRC
-*** Reformat buffer
-    #+BEGIN_SRC emacs-lisp
-   (defun reformat ()
-     "Reformats whole file with evil."
-     (interactive)
-     (let ((p (point)))
-       (evil-goto-first-line)
-       (evil-indent ((point-min) (point-max)))))
+** Codeblock
+   #+BEGIN_SRC emacs-lisp
+     (defun lisp-block ()
+       "Insert 'org-mode' emacs lisp block."
+       (interactive)
+       (insert "#+BEGIN_SRC emacs-lisp\n\n#+END_SRC\n")
+       (indent-buffer)
+       (forward-line -2)
+       (org-edit-special))
+   #+END_SRC
 
-    #+END_SRC
-*** Kill other buffers
-    #+BEGIN_SRC emacs-lisp
-  (defun kill-other-buffers ()
-    "Kill all buffers but the current one.
-  Don't mess with special buffers."
-    (interactive)
-    (dolist (buffer (buffer-list))
-      (unless (or (eql buffer (current-buffer)) (not (buffer-file-name buffer)))
-	(kill-buffer buffer))))
-    #+END_SRC
-* Keybindings
-  #+BEGIN_SRC emacs-lisp
-    (straight-use-package 'general)
-    (general-define-key)
-    ;;"M-x" 'helm-M-x)
+** Indent buffer
+   #+BEGIN_SRC emacs-lisp
+     (defun indent-buffer ()
+       (interactive)
+       (save-excursion
+	 (mark-whole-buffer)
+	 (delete-trailing-whitespace)
+	 (indent-region (point-min) (point-max))))
 
-    (general-define-key
-     :states '(normal visual insert emacs motion)
-     :prefix "SPC"
-     :non-normal-prefix "M-SPC"
-     "" nil
-     "TAB" '(iflipb-next-buffer :which-key "prev buffer")
-     "SPC" '(counsel-M-x :which-key "M-x")
-
-     "/" '(comment-line :which-key "comment")
-
-     "f" '(:ignore t :which-key "file")
-     "ft" '(neotree-toggle :which-key "toggle neotree")
-     "fp" '(neotree-project-dir :which-key "toggle neotree with projectile")
-     "fr" 'ranger
-     "fd" '(counsel-git :which-key "find in git dir")
-     "ff" '(counsel-find-file :which-key "open")
-     "fF" '(counsel-projectile-find-file :which-key "open")
-     "fe" '(:ignore t :which-key "emacs")
-     "fec" '(reload-config :which-key "reload config")
-
-     "p" '(:ignore t :which-key "project")
-     "ps" '(projectile-switch-project :which-key "switch")
-
-     "b" '(:ignore t :which-key "buffer")
-     "bb" '(counsel-ibuffer :which-key "choose")
-     "be" '(eval-buffer :which-key "eval")
-     "bs" '(save-buffer :which-key "save")
-     "bk" '(kill-buffer :which-key "kill")
-     "bn" '(new-empty-buffer :which-key "new")
-     "bK" '(kill-other-buffers :which-key "kill others")
-
-     "t" '(:ignore t :which-key "toggles")
-     "tm" '(minimap-mode :which-key "minimap")
-     "tf" '(dired-sidebar-toggle-sidebar :which-key "files sidebar")
-
-     "p" '(:ignore t :which-key "project")
-     "pf" '(counsel-projectile-find-file :which-key "file")
-     "pp" '(counsel-projectile-switch-project :which-key "open")
-
-     "w" '(:ignore t :which-key "window")
-     "ww" '(ace-window :which-key "switch")
-     "ws" '(ace-swap-window :which-key "swap")
-     "wk" '(delete-window :which-key "kill")
-     "w/" '(split-window-right :which-key "split right")
-     "w-" '(split-window-below :which-key "split below")
-     "wf" '(delete-other-windows :which-key "fullscreen")
-
-     "g" '(:ignore t :which-key "git")
-     "gs" '(magit-status :which-key "magit"))
-
-    (general-define-key 
-     :keymaps 'go-mode-map
-     :states '(normal)
-     "g" '(:ignore t :which-key "Go to")
-     "gd" '(go-guru-definition :which-key "definition")
-     "gD" '(go-guru-definition-other-window :which-key "definition (other win)"))
-  #+END_SRC
-  
+     (global-set-key "\C-x\\" 'indent-buffer)
+   #+END_SRC
