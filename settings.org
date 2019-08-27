@@ -85,6 +85,14 @@
        (autopair-global-mode))
    #+END_SRC
 
+** Projectile
+   #+BEGIN_SRC emacs-lisp
+     (use-package projectile
+       :straight t
+       :config
+       (projectile-mode +1))
+   #+END_SRC
+
 ** Transpose frame
    #+BEGIN_SRC emacs-lisp
      (use-package transpose-frame
@@ -115,46 +123,52 @@
      (use-package counsel
        :straight t
        :after ivy
+       :defer nil
        :bind (("M-x" . counsel-M-x)
 	      ("C-s" . swiper-isearch)
-	      ("C-x C-f" . counsel-find-file)
+	      ("C-x C-f" . counsel-project-file-jump)
 	      ("C-c w" . hydra-window/body)))
 
      (use-package ace-window
        :straight t)
 
+     (defun counsel-project-file-jump ()
+       (interactive)
+       (counsel-file-jump nil (projectile-project-p)))
+
      (pretty-hydra-define hydra-window
-			  (:color amaranth :quit-key "q")
-			  ("Buffer"
-			   (("," previous-buffer "previous")
-			    ("." next-buffer "next")
-			    ("bb" counsel-ibuffer "jump buffer")
-			    ("c" crux-create-scratch-buffer "scratch")
-			    ("k" kill-current-buffer "kill"))
-			   "Window"
-			   (("ww" ace-window "switch")
-			    ("s" ace-swap-window "swap")
-			    ("v" split-window-below "split below")
-			    ("h" split-window-right "wplit right")
-			    ("wk" delete-window "kill")
-			    ("f" delete-other-windows "fullscreen"))))
+       (:color amaranth :quit-key "q")
+       ("Buffer"
+	(("," previous-buffer "previous")
+	 ("." next-buffer "next")
+	 ("bb" counsel-ibuffer "jump buffer")
+	 ("c" crux-create-scratch-buffer "scratch")
+	 ("k" kill-current-buffer "kill"))
+	"Window"
+	(("ww" ace-window "switch")
+	 ("s" ace-swap-window "swap")
+	 ("v" split-window-below "split below")
+	 ("h" split-window-right "wplit right")
+	 ("wk" delete-window "kill")
+	 ("f" delete-other-windows "fullscreen"))))
    #+END_SRC
 
 ** Magit
    #+BEGIN_SRC emacs-lisp
-     (use-package magit
-       :straight t
-       :config
-       (defalias 'magit-diff-visit-file 'magit-diff-visit-file-other-window)
-       :pretty-hydra
-       ((:color teal :quit-key "q")
-	("View"
-	 (("s" magit-status "status")
-	  ("l" magit-log-all-branches "log"))
-	 "Do"
-	 (("p" magit-push "push")
-	  ("z" magit-stash "stash"))))
-       :bind ("C-c g" . magit-hydra/body))
+	  (use-package magit
+	    :straight t
+	    :config
+	    (defalias 'magit-diff-visit-file 'magit-diff-visit-file-other-window)
+	    :pretty-hydra
+	    ((:color teal :quit-key "q")
+	     ("View"
+	      (("s" magit-status "status")
+	       ("l" magit-log-all-branches "log")
+	       ("b" magit-blame "blame"))
+	      "Do"
+	      (("p" magit-push "push")
+	       ("z" magit-stash "stash"))))
+	    :bind ("C-c g" . magit-hydra/body))
    #+END_SRC
 
 ** Crux
@@ -166,6 +180,11 @@
    #+END_SRC
 
 ** Helpful
+   #+BEGIN_SRC emacs-lisp
+     (use-package helpful
+       :straight t)
+   #+END_SRC
+
 ** Multiple Cursors
    #+BEGIN_SRC emacs-lisp
      (use-package multiple-cursors
@@ -202,7 +221,15 @@
 ** General completion
    #+BEGIN_SRC emacs-lisp
      (use-package company
+       :straight t
        :hook (after-init-hook . global-company-mode))
+   #+END_SRC
+
+** Flycheck
+   #+BEGIN_SRC emacs-lisp
+     (use-package flycheck
+       :straight t
+       :init (global-flycheck-mode))
    #+END_SRC
 
 ** Go
@@ -225,10 +252,12 @@
 	   ("gD" godef-jump-other-window "definition (other window)")))))
 
      (use-package go-eldoc
+       :straight t
        :after go-mode
        :hook (go-mode . go-eldoc-setup))
 
      (use-package company-go
+       :straight t
        :after go-mode)
    #+END_SRC
 
