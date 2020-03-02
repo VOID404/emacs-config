@@ -323,6 +323,15 @@
        :straight t)
    #+END_SRC
 
+** SLIME
+   #+BEGIN_SRC emacs-lisp
+     (use-package slime
+       :straight t
+       :config
+       (setq inferior-lisp-program "/usr/bin/sbcl")
+       (setq slime-contribs '(slime-fancy)))
+   #+END_SRC
+
 ** Webmode
    #+BEGIN_SRC emacs-lisp
      (use-package web-mode
