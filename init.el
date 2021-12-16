@@ -4,6 +4,8 @@
 (set-face-attribute 'default nil :height 120)
 (set-face-font 'default "Fira Code")
 
+(delete-selection-mode 1)
+
 (setq initial-scratch-message ";; Happy hacking!\n")
 (setq inhibit-startup-screen t)
 
