@@ -2,7 +2,8 @@
 ** All the icons
    #+BEGIN_SRC emacs-lisp
      (use-package all-the-icons
-       :straight t)
+       :straight t
+       :if (display-graphic-p))
    #+END_SRC
 
 ** Modeline
@@ -43,7 +44,7 @@
 
      (load-theme 'cyberpunk t)
    #+END_SRC
-
+* Utils
 ** Neotree
    #+BEGIN_SRC emacs-lisp
      (use-package neotree
@@ -56,7 +57,6 @@
        :bind ("C-c f" . neotree-show))
    #+END_SRC
 
-* Utils
 ** Hydra
    #+BEGIN_SRC emacs-lisp
      (use-package hydra
@@ -68,14 +68,6 @@
        :defer nil
        :bind
        ("M-SPC" . major-mode-hydra))
-   #+END_SRC
-
-** Ranger
-   #+BEGIN_SRC emacs-lisp
-     (use-package ranger
-       :straight t
-       :commands ranger
-       :bind ("C-c r" . ranger))
    #+END_SRC
 
 ** Auto Brackets
@@ -156,23 +148,24 @@
 	 ("wk" delete-window "kill")
 	 ("f" delete-other-windows "fullscreen"))))
    #+END_SRC
-
+   
 ** Magit
    #+BEGIN_SRC emacs-lisp
-	  (use-package magit
-	    :straight t
-	    :config
-	    (defalias 'magit-diff-visit-file 'magit-diff-visit-file-other-window)
-	    :pretty-hydra
-	    ((:color teal :quit-key "q")
-	     ("View"
-	      (("s" magit-status "status")
-	       ("l" magit-log-all-branches "log")
-	       ("b" magit-blame "blame"))
-	      "Do"
-	      (("p" magit-push "push")
-	       ("z" magit-stash "stash"))))
-	    :bind ("C-c g" . magit-hydra/body))
+     (use-package magit
+       :straight t
+       :config
+       (defalias 'magit-diff-visit-file 'magit-diff-visit-file-other-window)
+       :pretty-hydra
+       ((:color teal :quit-key "q")
+	("View"
+	 (("s" magit-status "status")
+	  ("l" magit-log-all-branches "log")
+	  ("b" magit-blame "blame"))
+	 "Do"
+	 (("p" magit-push "push")
+	  ("z" magit-stash "stash"))))
+       :bind (("C-c g h" . magit-hydra/body)
+	      ("C-c g g")))
    #+END_SRC
 
 ** Crux
@@ -182,43 +175,11 @@
        :bind (("C-k" . crux-smart-kill-line)
 	      ("C-a" . crux-move-beginning-of-line)))
    #+END_SRC
-
+   
 ** Helpful
    #+BEGIN_SRC emacs-lisp
      (use-package helpful
        :straight t)
-   #+END_SRC
-
-** Multiple Cursors
-   #+BEGIN_SRC emacs-lisp
-     (use-package multiple-cursors
-       :straight t
-       :bind ("C-d" . hydra-multiple-cursors/body))
-
-     (defhydra hydra-multiple-cursors (:hint nil)
-       "
-      Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cursor%s(if (> (mc/num-cursors) 1) \"s\" \"\")
-     ------------------------------------------------------------------
-      [_p_]   Next     [_n_]   Next     [_l_] Edit lines  [_0_] Insert numbers
-      [_P_]   Skip     [_N_]   Skip     [_a_] Mark all    [_A_] Insert letters
-      [_M-p_] Unmark   [_M-n_] Unmark   [_s_] Search
-      [Click] Cursor at point       [_q_] Quit"
-       ("l" mc/edit-lines :exit t)
-       ("a" mc/mark-all-like-this :exit t)
-       ("n" mc/mark-next-like-this)
-       ("N" mc/skip-to-next-like-this)
-       ("M-n" mc/unmark-next-like-this)
-       ("p" mc/mark-previous-like-this)
-       ("P" mc/skip-to-previous-like-this)
-       ("M-p" mc/unmark-previous-like-this)
-       ("s" mc/mark-all-in-region-regexp :exit t)
-       ("0" mc/insert-numbers :exit t)
-       ("A" mc/insert-letters :exit t)
-       ("<mouse-1>" mc/add-cursor-on-click)
-       ;; Help with click recognition in this hydra
-       ("<down-mouse-1>" ignore)
-       ("<drag-mouse-1>" ignore)
-       ("q" nil :color blue))
    #+END_SRC
 
 * Language Support
@@ -230,223 +191,30 @@
        (global-company-mode))
 
      (use-package lsp-mode
-       :straight t)
+       :straight t
+       :init
+       (setq lsp-keymap-prefix "C-c l")
+       :config
+       :hook ((lsp-mode . lsp-enable-which-key-integration)
+	      (go-ts-mode . lsp-deferred)))
 
      (use-package lsp-ui
        :straight t)
    #+END_SRC
-
 ** Flycheck
    #+BEGIN_SRC emacs-lisp
      (use-package flycheck
        :straight t
        :init (global-flycheck-mode))
    #+END_SRC
+** Treesit
+#+BEGIN_SRC emacs-lisp
+  (use-package treesit-auto
+    :straight t
+    :config
+    (global-treesit-auto-mode))
 
-** Go
-   #+BEGIN_SRC emacs-lisp
-     (use-package go-mode
-       :straight t
-       :mode "\\.go\\'"
-       :hook (go-mode .
-		      (lambda ()
-			(message "debug")
-			(setq gofmt-command "goimports")
-			(add-hook 'before-save-hook 'gofmt-before-save)
-			(set (make-local-variable 'company-backends)
-			     '((company-dabbrev-code company-go)))))
-       :config
-       (major-mode-hydra-define go-mode
-	 (:color pink :quit-key "q")
-	 ("Goto"
-	  (("gd" godef-jump "definition")
-	   ("gD" godef-jump-other-window "definition (other window)"))
-	  "Refactor"
-	  (("r" go-rename "rename")
-	   ("p" go-mvpkg "rename package")))))
-
-     (use-package go-rename
-       :straight t
-       :after go-mode)
-
-     (use-package go-eldoc
-       :straight t
-       :after go-mode
-       :hook (go-mode . go-eldoc-setup))
-
-     (use-package company-go
-       :straight t
-       :after go-mode)
-   #+END_SRC
-
-** Dockerfile
-   #+BEGIN_SRC emacs-lisp
-     (use-package dockerfile-mode
-       :straight t
-       :mode "\\^Dockerfile\\'")
-   #+END_SRC
-
-** Yaml
-   #+BEGIN_SRC emacs-lisp
-     (use-package yaml-mode
-       :straight t
-       :mode "\\.ya?ml\\'")
-   #+END_SRC
-
-** REST
-   #+BEGIN_SRC emacs-lisp
-     (when (string-equal system-type "darwin")
-       (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
-
-     (use-package restclient
-       :straight t
-       :mode ("\\.http\\'" . restclient-mode)
-       :mode ("\\.rest\\'" . restclient-mode)
-       :config
-       (major-mode-hydra-define restclient-mode
-	 (:color red :quit-key "q")
-	 ("Send"
-	  (("s" restclient-http-send-current-stay-in-window "pretty")
-	   ("r" restclient-http-send-current-raw "raw")
-	   ("f" restclient-http-send-current "send and focus"))
-	  "Navigation"
-	  (("n" restclient-jump-next "next")
-	   ("p" restclient-jump-prev "previous")
-	   ("<tab>" restclient-toggle-body-visibility "collapse/expand")
-	   ("m" restclient-mark-current "mark current")))))
-   #+END_SRC
-
-** React
-   #+BEGIN_SRC emacs-lispl
-     (use-package rjsx-mode
-       :mode "components\\/.*\\.js\\'"
-       :straight t)
-   #+END_SRC
-
-** SLIME
-   #+BEGIN_SRC emacs-lisp
-     (use-package slime
-       :straight t
-       :config
-       (setq inferior-lisp-program "/usr/bin/sbcl")
-       (setq slime-contribs '(slime-fancy)))
-   #+END_SRC
-
-** Webmode
-   #+BEGIN_SRC emacs-lisp
-     (use-package web-mode
-       :straight t
-       :mode "\\.vue\\'")
-   #+END_SRC
-
-** Typescript
-   #+BEGIN_SRC emacs-lisp
-     (use-package tide
-       :straight t
-       :hook (typescript-mode-hook . setup-tide-mode))
-
-     (defun setup-tide-mode ()
-       (interactive)
-       (tide-setup)
-       (flycheck-mode +1)
-       (setq flycheck-check-syntax-automatically '(save mode-enabled))
-       (eldoc-mode +1)
-       (tide-hl-identifier-mode +1)
-       ;; company is an optional dependency. You have to
-       ;; install it separately via package-install
-       ;; `M-x package-install [ret] company`
-       (company-mode +1))
-   #+END_SRC
-
-* Scripts
-** Codeblock
-   #+BEGIN_SRC emacs-lisp
-     (defun lisp-block ()
-       "Insert 'org-mode' emacs lisp block."
-       (interactive)
-       (insert "#+BEGIN_SRC emacs-lisp\n\n#+END_SRC\n")
-       (indent-buffer)
-       (forward-line -2)
-       (org-edit-special))
-   #+END_SRC
-
-** Indent buffer
-   #+BEGIN_SRC emacs-lisp
-     (defun indent-buffer ()
-       (interactive)
-       (save-excursion
-	 (mark-whole-buffer)
-	 (delete-trailing-whitespace)
-	 (indent-region (point-min) (point-max))))
-
-     (global-set-key "\C-x\\" 'indent-buffer)
-   #+END_SRC
-
-** Go mvpkg
-   #+BEGIN_SRC emacs-lisp
-     (defun go-mvpkg ()
-       (interactive)
-       (let* ((buf nil)
-	      (old (gmv/package))
-	      (prefix (gmv/pkgpath old))
-	      (new (concat prefix "/" (read-string "Rename to: ")))
-	      (ok (y-or-n-p (format "Moving %s to %s, is that OK? "
-				    (gmv/pkgname old)
-				    (gmv/pkgname new))))
-	      (command (concat "gomvpkg -from " old " -to " new)))
-	 (when ok
-	   (message "Calling \"%s\"" command)
-	   (in-project
-	    (setq buf (shell-command-to-string command)))
-	   (gmv/fix-buffers old new)
-	   (gmv/fix-all-tests)
-	   (pop-to-buffer "*gomvpkg*")
-	   (local-set-key (kbd "C-q") 'kill-buffer-and-window)
-	   (insert buf))))
-
-     (defmacro in-project (&rest body)
-       `(let ((default-directory (projectile-project-root)))
-	  ,@body))
-
-     (defun gmv/pkgname (pkg)
-       (car (last (split-string pkg "/"))))
-
-     (defun gmv/pkgpath (pkg &optional num)
-       (string-join (butlast (split-string pkg "/") (or num 1)) "/"))
-
-     (defun gmv/package ()
-       (string-trim (shell-command-to-string "go list")))
-
-     (defun gmv/fix-buffers (old new)
-       (let* ((original default-directory)
-	      (current (concat (gmv/pkgpath original 2) "/" (gmv/pkgname new) "/")))
-	 (dolist (buf (buffer-list))
-	   (with-current-buffer buf
-	     (when (and (buffer-file-name) (string-prefix-p original (buffer-file-name)))
-	       (set-visited-file-name (replace-regexp-in-string original
-								current
-								(buffer-file-name)))
-	       (revert-buffer :ignore-auto :noconfirm))))))
-
-     (defun gmv/fix-all-tests ()
-       (when (y-or-n-p "Do you use _test suffix in tests? ")
-	 (dolist (f (directory-files default-directory))
-	   (gmv/fix-test f))))
-     '
-     (defun gmv/fix-test (path)
-       (when (string-suffix-p "_test.go" path)
-	 (with-temp-file path
-	   (insert-file-contents path)
-	   (beginning-of-buffer)
-	   (end-of-line)
-	   (unless (string-suffix-p "_test\n" (thing-at-point 'line))
-	     (insert "_test")))))
-
-     (defun gmv/saved-buffers-p ()
-       (let ((ok t))
-	 (dolist (buf (list-buffers) ok)
-	   (with-current-buffer buf
-	     (when (and (buffer-file-name) (buffer-modified-p))
-	       (message "Unsaved buffers. Save before continuing.")
-	       (setq ok nil))))))
-   #+END_SRC
+  (dolist (v '(("\\.go$" . go-ts-mode)
+	       ("/go.mod$" . go-mod-ts-mode)))
+    (add-to-list 'auto-mode-alist v))
+#+END_SRC
