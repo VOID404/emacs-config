@@ -1,275 +1,157 @@
 * UI
-** All the icons
-   #+BEGIN_SRC emacs-lisp
-     (use-package all-the-icons
-       :straight t
-       :if (display-graphic-p))
-   #+END_SRC
-
-** Modeline
-   #+BEGIN_SRC emacs-lisp
-     (use-package doom-modeline
-       :straight t
-       :init
-       (setq-default battery-mode-line-format "[%b%p%%  %t] ")
-       (setq-default display-time-default-load-average nil)
-       (setq-default display-time-format "%H:%M")
-       :config
-       (display-battery-mode)
-       (display-time-mode)
-       (doom-modeline-mode 1))
-   #+END_SRC
-
-** Which key
-   #+BEGIN_SRC emacs-lisp
-     (use-package which-key
-       :straight t
-       :config
-       (which-key-mode 1))
-   #+END_SRC
-
-** Themes
-   #+BEGIN_SRC emacs-lisp
-     (use-package dracula-theme
-       :straight t
-       :defer t)
-
-     (use-package base16-theme
-       :straight t
-       :defer t)
-
-     (use-package cyberpunk-theme
-       :straight t
-       :defer t)
-
-     (load-theme 'cyberpunk t)
-   #+END_SRC
-** Tabs
 #+BEGIN_SRC emacs-lisp
-  (use-package centaur-tabs
-    :straight t)
+  (elpaca all-the-icons
+    (require 'all-the-icons))
+
+  (elpaca doom-modeline
+    (require 'doom-modeline)
+    (setq-default battery-mode-line-format "[%b%p%%  %t] ")
+    (setq-default display-time-default-load-average nil)
+    (setq-default display-time-format "%H:%M")
+
+    (display-battery-mode)
+    (display-time-mode)
+    (doom-modeline-mode 1))
+
+  (elpaca dracula-theme
+     (require 'dracula-theme))
+
+  (elpaca base16-theme
+    (require 'base16-theme))
+
+  (elpaca cyberpunk-theme
+    (require 'cyberpunk-theme)
+    (load-theme 'cyberpunk t))
 #+END_SRC
-* Utils
-** General
+
+* Behaviour
 #+BEGIN_SRC emacs-lisp
-  (use-package general
-    :straight t)
+  (show-paren-mode)
+  (electric-pair-mode)
+
+  (elpaca which-key
+    (require 'which-key)
+    (which-key-mode 1))
+
+  (elpaca vimish-fold
+    (require 'vimish-fold)
+    (vimish-fold-global-mode 1))
+
+  (elpaca helpful
+    (require 'helpful))
+
+  (elpaca consult
+    (require 'consult))
+
+  (elpaca vertico
+    (require 'vertico)
+    (vertico-mode 1))
+
+  (elpaca marginalia
+    (require 'marginalia)
+    (marginalia-mode))
+
+  (elpaca orderless
+    (require 'orderless)
+    (setq completion-styles '(orderless)))
+
+  (elpaca projectile
+    (require 'projectile)
+    (projectile-mode 1)
+    (add-to-list 'projectile-project-root-files-bottom-up "go.mod"))
+#+END_SRC
+
+* Tools
+#+BEGIN_SRC emacs-lisp
+  (elpaca magit
+    (require 'magit)
+    (defalias 'magit-diff-visit-file 'magit-diff-visit-file-other-window)
+    (transient-append-suffix 'magit-log '(0 -1) '(3 "=p" "First parent" "--first-parent")))
+
+  (elpaca treemacs
+    (require 'treemacs)
+    (treemacs-follow-mode t))
+
+  (elpaca treemacs-projectile
+    (require 'treemacs-projectile))
+
+  (elpaca treemacs-magit
+    (require 'treemacs-magit))
+
+#+END_SRC
+
+* Languages
+#+BEGIN_SRC emacs-lisp
+  (elpaca treesit-auto
+    (require 'treesit-auto)
+    (global-treesit-auto-mode)
+    (dolist (m '(("\\.go$" . go-ts-mode)
+		 ("/go.mod$" . go-mod-ts-mode)
+		 ("\\.ya?ml$" . yaml-ts-mode)))
+      (add-to-list 'auto-mode-alist m)))
+
+  (elpaca nil
+    (dolist (m '(go-ts-mode-hook))
+      (add-hook m 'eglot-ensure)))
+
+  ;; Enable completion on tab
+  (setq tab-always-indent 'complete)
+
+  ;; In-buffer completion window
+  (elpaca corfu
+    (require 'corfu)
+    (global-corfu-mode)
+    (setq corfu-cycle t)
+    (setq corfu-auto t))
+
+  (elpaca flycheck
+    (require 'flycheck)
+    (global-flycheck-mode))
+#+END_SRC
+
+* Keybindings
+#+BEGIN_SRC emacs-lisp
+  (defun void/ripgrep ()
+    "Search with `rg` current project (or current dir)"
+    (interactive)
+    (consult-ripgrep (projectile-project-root) nil))
+
+  (defun void/dotfile ()
+    "Open emacs settings file"
+    (interactive)
+    (find-file (expand-file-name "settings.org" user-emacs-directory)))
+
+  (defun void/reload ()
+    "Reload emacs config"
+    (interactive)
+    (load (expand-file-name "init.el" user-emacs-directory)))
 
   (general-define-key
    :prefix "C-c"
-   "SPC" 'ivy-switch-buffer)
-#+END_SRC
-** XCLIP
-#+BEGIN_SRC emacs-lisp
-  (use-package xclip
-    :straight t
-    :config
-    (xclip-mode 1))
-#+END_SRC
-** Vimish fold
-#+BEGIN_SRC emacs-lisp
-    (use-package vimish-fold
-      :straight t
-      :bind (("C-c z f" . vimish-fold)
-	     ("C-c z d" . vimish-fold-delete)
-	     ("C-c z a" . vimish-fold-toggle))
-      :config
-      (vimish-fold-global-mode 1))
-#+END_SRC
-** Treemacs
-   #+BEGIN_SRC emacs-lisp
-     (use-package treemacs
-       :straight t
-       :config
-       (treemacs-follow-mode t)
-       :bind ("C-c o t" . treemacs))
 
-     (use-package treemacs-projectile
-       :straight t
-       :after (treemacs projectile))
+   "SPC" 'consult-buffer
+   "/" 'void/ripgrep
 
-     (use-package treemacs-magit
-       :straight t
-       :after (treemacs magit))
+   "f f" 'find-file
+   "f p" 'projectile-find-file
+   "f d" 'void/dotfile
 
-     (use-package lsp-treemacs
-       :straight t
-       :after (treemacs lsp))
-   #+END_SRC
+   "p p" 'projectile-switch-project
+   "p a" 'projectile-add-known-project
+   "p d" 'projectile-remove-known-project
 
-** Hydra
-   #+BEGIN_SRC emacs-lisp
-     (use-package hydra
-       :straight t)
-     (use-package pretty-hydra
-       :straight t)
-     (use-package major-mode-hydra
-       :straight t
-       :defer nil
-       :bind
-       ("M-SPC" . major-mode-hydra))
-   #+END_SRC
+   "c r" 'eglot-rename
+   "c d" 'xref-find-definitions
+   "c D" 'xref-find-references
 
-** Auto Brackets
-   #+BEGIN_SRC emacs-lisp
-     (show-paren-mode)
-     (electric-pair-mode)
-   #+END_SRC
+   "g g" 'magit-status
+   "g b" 'magit-blame
+   "g c" 'magit-checkout
 
-** Projectile
-   #+BEGIN_SRC emacs-lisp
-     (use-package ripgrep
-       :straight t)
-     (use-package projectile
-       :straight t
-       :config
-       (projectile-mode 1)
-       (add-to-list 'projectile-project-root-files-bottom-up "go.mod")
-       :general (:keymap 'projectile-mode-map
-		 :prefix "C-c p"
-		 "p" 'projectile-switch-project
-		 "a" 'projectile-add-known-project
-		 "d" 'projectile-remove-known-project
-		 "/" 'counsel-projectile-rg)
-       :general (:keymap 'projectile-mode-map
-		 "C-c f p" 'projectile-find-file))
+   "r d" 'void/reload
 
-     (use-package counsel-projectile
-       :straight t
-       :after (counsel projectile)
-       :config
-       (counsel-projectile-mode 1))
-   #+END_SRC
-
-** Transpose frame
-   #+BEGIN_SRC emacs-lisp
-     (use-package transpose-frame
-       :straight t
-       :pretty-hydra
-       ((:color red :quit-key "q")
-	("Transpose"
-	 (("h" flop-frame "horizontal")
-	  ("v" flip-frame "vertical")
-	  ("r" rotate-frame-clockwise "rotate 90")
-	  ("R" rotate-frame-clockwise "rotate 180"))))
-       :bind ("C-c t" . transpose-frame-hydra/body))
-   #+END_SRC
-
-** Ivy
-   #+BEGIN_SRC emacs-lisp
-     (use-package ivy
-       :straight t
-       :config
-       (ivy-mode 1))
-
-     (use-package all-the-icons-ivy
-       :straight t
-       :after (ivy all-the-icons)
-       :config
-       (all-the-icons-ivy-setup))
-
-     (use-package counsel
-       :straight t
-       :after ivy
-       :defer nil
-       :bind (("M-x" . counsel-M-x)
-	      ("C-s" . swiper-isearch)
-	      ("C-x C-f" . counsel-find-file)
-	      ("C-x M-f" . counsel-project-file-jump)
-	      ("C-x d" . counsel-dired)
-	      ("C-c w" . hydra-window/body)))
-
-     (use-package ace-window
-       :straight t)
-
-     (defun counsel-project-file-jump ()
-       (interactive)
-       (counsel-file-jump nil (projectile-project-p)))
-
-     (pretty-hydra-define hydra-window
-       (:color amaranth :quit-key "q")
-       ("Buffer"
-	(("," previous-buffer "previous")
-	 ("." next-buffer "next")
-	 ("bb" counsel-ibuffer "jump buffer")
-	 ("c" crux-create-scratch-buffer "scratch")
-	 ("k" kill-current-buffer "kill"))
-	"Window"
-	(("ww" ace-window "switch")
-	 ("s" ace-swap-window "swap")
-	 ("v" split-window-below "split below")
-	 ("h" split-window-right "wplit right")
-	 ("wk" delete-window "kill")
-	 ("f" delete-other-windows "fullscreen"))))
-   #+END_SRC
-   
-** Magit
-   #+BEGIN_SRC emacs-lisp
-		    (use-package magit
-		      :straight t
-		      :config
-		      (defalias 'magit-diff-visit-file 'magit-diff-visit-file-other-window)
-		      :pretty-hydra
-		      ((:color teal :quit-key "q")
-		       ("View"
-			(("s" magit-status "status")
-			 ("l" magit-log-all-branches "log")
-			 ("b" magit-blame "blame"))
-			"Do"
-			(("p" magit-push "push")
-			 ("z" magit-stash "stash"))))
-		      :bind (("C-c g h" . magit-hydra/body)
-			     ("C-c g g" . magit-status)
-			     ("C-c g b" . magit-checkout)
-			     ("C-c g c" . magit-commit)))
-   #+END_SRC
-
-** Crux
-   #+BEGIN_SRC emacs-lisp
-     (use-package crux
-       :straight t
-       :bind (("C-k" . crux-smart-kill-line)
-	      ("C-a" . crux-move-beginning-of-line)))
-   #+END_SRC
-   
-** Helpful
-   #+BEGIN_SRC emacs-lisp
-     (use-package helpful
-       :straight t)
-   #+END_SRC
-
-* Language Support
-** Flycheck
-   #+BEGIN_SRC emacs-lisp
-     (use-package flycheck
-       :straight t
-       :init (global-flycheck-mode))
-   #+END_SRC
-** Treesit
-#+BEGIN_SRC emacs-lisp
-  (use-package company
-    :straight t
-    :config
-    (global-company-mode))
-
-  (use-package treesit-auto
-    :straight t
-    :config
-    (global-treesit-auto-mode))
-
-  (dolist (v '(("\\.go$" . go-ts-mode)
-	       ("/go.mod$" . go-mod-ts-mode)))
-    (add-to-list 'auto-mode-alist v))
-
-  (dolist (m '(go-ts-mode-hook))
-    (add-hook m 'eglot-ensure))
-
+   "o t" 'treemacs)
 
   (general-define-key
-   :keymaps 'eglot-mode-map
-   :prefix "C-c c"
-   "r" 'eglot-rename
-   "d" 'xref-find-definitions
-   "o d" 'xref-find-definitions-other-window
-   "D" 'xref-find-references)
+   "C-s" 'consult-line)
 #+END_SRC
