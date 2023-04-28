@@ -44,17 +44,57 @@
 
      (load-theme 'cyberpunk t)
    #+END_SRC
+** Tabs
+#+BEGIN_SRC emacs-lisp
+  (use-package centaur-tabs
+    :straight t)
+#+END_SRC
 * Utils
-** Neotree
+** General
+#+BEGIN_SRC emacs-lisp
+  (use-package general
+    :straight t)
+
+  (general-define-key
+   :prefix "C-c"
+   "SPC" 'ivy-switch-buffer)
+#+END_SRC
+** XCLIP
+#+BEGIN_SRC emacs-lisp
+  (use-package xclip
+    :straight t
+    :config
+    (xclip-mode 1))
+#+END_SRC
+** Vimish fold
+#+BEGIN_SRC emacs-lisp
+    (use-package vimish-fold
+      :straight t
+      :bind (("C-c z f" . vimish-fold)
+	     ("C-c z d" . vimish-fold-delete)
+	     ("C-c z a" . vimish-fold-toggle))
+      :config
+      (vimish-fold-global-mode 1))
+#+END_SRC
+** Treemacs
    #+BEGIN_SRC emacs-lisp
-     (use-package neotree
+     (use-package treemacs
        :straight t
        :config
-       (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
-       (setq neo-autorefresh nil)
-       (setq neo-smart-open nil)
-       (setq neo-window-fixed-size nil)
-       :bind ("C-c f" . neotree-show))
+       (treemacs-follow-mode t)
+       :bind ("C-c o t" . treemacs))
+
+     (use-package treemacs-projectile
+       :straight t
+       :after (treemacs projectile))
+
+     (use-package treemacs-magit
+       :straight t
+       :after (treemacs magit))
+
+     (use-package lsp-treemacs
+       :straight t
+       :after (treemacs lsp))
    #+END_SRC
 
 ** Hydra
@@ -73,18 +113,32 @@
 ** Auto Brackets
    #+BEGIN_SRC emacs-lisp
      (show-paren-mode)
-     (use-package autopair
-       :straight t
-       :config
-       (autopair-global-mode))
+     (electric-pair-mode)
    #+END_SRC
 
 ** Projectile
    #+BEGIN_SRC emacs-lisp
+     (use-package ripgrep
+       :straight t)
      (use-package projectile
        :straight t
        :config
-       (projectile-mode +1))
+       (projectile-mode 1)
+       (add-to-list 'projectile-project-root-files-bottom-up "go.mod")
+       :general (:keymap 'projectile-mode-map
+		 :prefix "C-c p"
+		 "p" 'projectile-switch-project
+		 "a" 'projectile-add-known-project
+		 "d" 'projectile-remove-known-project
+		 "/" 'counsel-projectile-rg)
+       :general (:keymap 'projectile-mode-map
+		 "C-c f p" 'projectile-find-file))
+
+     (use-package counsel-projectile
+       :straight t
+       :after (counsel projectile)
+       :config
+       (counsel-projectile-mode 1))
    #+END_SRC
 
 ** Transpose frame
@@ -151,21 +205,23 @@
    
 ** Magit
    #+BEGIN_SRC emacs-lisp
-     (use-package magit
-       :straight t
-       :config
-       (defalias 'magit-diff-visit-file 'magit-diff-visit-file-other-window)
-       :pretty-hydra
-       ((:color teal :quit-key "q")
-	("View"
-	 (("s" magit-status "status")
-	  ("l" magit-log-all-branches "log")
-	  ("b" magit-blame "blame"))
-	 "Do"
-	 (("p" magit-push "push")
-	  ("z" magit-stash "stash"))))
-       :bind (("C-c g h" . magit-hydra/body)
-	      ("C-c g g")))
+		    (use-package magit
+		      :straight t
+		      :config
+		      (defalias 'magit-diff-visit-file 'magit-diff-visit-file-other-window)
+		      :pretty-hydra
+		      ((:color teal :quit-key "q")
+		       ("View"
+			(("s" magit-status "status")
+			 ("l" magit-log-all-branches "log")
+			 ("b" magit-blame "blame"))
+			"Do"
+			(("p" magit-push "push")
+			 ("z" magit-stash "stash"))))
+		      :bind (("C-c g h" . magit-hydra/body)
+			     ("C-c g g" . magit-status)
+			     ("C-c g b" . magit-checkout)
+			     ("C-c g c" . magit-commit)))
    #+END_SRC
 
 ** Crux
@@ -183,24 +239,6 @@
    #+END_SRC
 
 * Language Support
-** General completion
-   #+BEGIN_SRC emacs-lisp
-     (use-package company
-       :straight t
-       :config
-       (global-company-mode))
-
-     (use-package lsp-mode
-       :straight t
-       :init
-       (setq lsp-keymap-prefix "C-c l")
-       :config
-       :hook ((lsp-mode . lsp-enable-which-key-integration)
-	      (go-ts-mode . lsp-deferred)))
-
-     (use-package lsp-ui
-       :straight t)
-   #+END_SRC
 ** Flycheck
    #+BEGIN_SRC emacs-lisp
      (use-package flycheck
@@ -209,6 +247,11 @@
    #+END_SRC
 ** Treesit
 #+BEGIN_SRC emacs-lisp
+  (use-package company
+    :straight t
+    :config
+    (global-company-mode))
+
   (use-package treesit-auto
     :straight t
     :config
@@ -217,4 +260,16 @@
   (dolist (v '(("\\.go$" . go-ts-mode)
 	       ("/go.mod$" . go-mod-ts-mode)))
     (add-to-list 'auto-mode-alist v))
+
+  (dolist (m '(go-ts-mode-hook))
+    (add-hook m 'eglot-ensure))
+
+
+  (general-define-key
+   :keymaps 'eglot-mode-map
+   :prefix "C-c c"
+   "r" 'eglot-rename
+   "d" 'xref-find-definitions
+   "o d" 'xref-find-definitions-other-window
+   "D" 'xref-find-references)
 #+END_SRC
