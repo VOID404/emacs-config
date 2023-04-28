@@ -13,8 +13,8 @@
 (tool-bar-mode 0)
 (menu-bar-mode 0)
 
+(setq display-line-numbers-type 'relative)
 (global-display-line-numbers-mode)
-(setq-default display-line-numbers 'relative)
 
 (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 
