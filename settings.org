@@ -87,26 +87,42 @@
     (global-treesit-auto-mode)
     (dolist (m '(("\\.go$" . go-ts-mode)
 		 ("/go.mod$" . go-mod-ts-mode)
-		 ("\\.ya?ml$" . yaml-ts-mode)))
+		 ("\\.ya?ml$" . yaml-ts-mode)
+		 ("/Dockerfile" . dockerfile-ts-mode)))
       (add-to-list 'auto-mode-alist m)))
 
   (elpaca nil
-    (dolist (m '(go-ts-mode-hook))
+    (dolist (m '(go-ts-mode-hook dockerfile-ts-mode))
       (add-hook m 'eglot-ensure)))
 
   ;; Enable completion on tab
   (setq tab-always-indent 'complete)
 
   ;; In-buffer completion window
-  (elpaca corfu
+  (elpaca (corfu :files (:defaults "extensions/*"))
     (require 'corfu)
+    (require 'corfu-popupinfo)
+
     (global-corfu-mode)
     (setq corfu-cycle t)
-    (setq corfu-auto t))
+    (setq corfu-auto t)
+
+    (setq corfu-popupinfo-delay '(1.0 . 0.5))
+    (add-hook 'corfu-mode-hook 'corfu-popupinfo-mode))
 
   (elpaca flycheck
     (require 'flycheck)
     (global-flycheck-mode))
+
+  (elpaca markdown-mode
+    (require 'markdown-mode))
+#+END_SRC
+
+* Org
+#+BEGIN_SRC emacs-lisp
+  (elpaca org-roam
+    (require 'org-roam)
+    (setq org-roam-directory "~/org/roam"))
 #+END_SRC
 
 * Keybindings
@@ -125,6 +141,16 @@
     "Reload emacs config"
     (interactive)
     (load (expand-file-name "init.el" user-emacs-directory)))
+
+  (defun void/org-open ()
+    "Open an org note"
+    (interactive)
+    (ido-find-file-in-dir "~/org"))
+
+  (defun void/org-capture ()
+    "Capture org note"
+    (interactive)
+    (find-file "~/org/todo.org"))
 
   (general-define-key
    :prefix "C-c"
@@ -148,7 +174,14 @@
    "g b" 'magit-blame
    "g c" 'magit-checkout
 
+   "b r" 'revert-buffer-quick
+   "b d" 'kill-current-buffer
+   "b b" 'consult-buffer
+
    "r d" 'void/reload
+
+   "n f" 'void/org-open
+   "n c" 'void/org-capture
 
    "o t" 'treemacs)
 
