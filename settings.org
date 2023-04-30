@@ -14,14 +14,16 @@
     (doom-modeline-mode 1))
 
   (elpaca dracula-theme
-     (require 'dracula-theme))
+    (require 'dracula-theme))
 
   (elpaca base16-theme
     (require 'base16-theme))
 
   (elpaca cyberpunk-theme
-    (require 'cyberpunk-theme)
-    (load-theme 'cyberpunk t))
+    (require 'cyberpunk-theme))
+
+  (add-to-list 'custom-theme-load-path "~/.config/emacs/themes/dracula-pro")
+  (load-theme 'dracula-pro-vanhelsing t)
 #+END_SRC
 
 * Behaviour
@@ -116,6 +118,10 @@
 
   (elpaca markdown-mode
     (require 'markdown-mode))
+
+  (elpaca parinfer-rust-mode
+    (require 'parinfer-rust-mode)
+    (add-hook 'elisp-mode-hook 'parinfer-rust-mode))
 #+END_SRC
 
 * Org
@@ -123,6 +129,79 @@
   (elpaca org-roam
     (require 'org-roam)
     (setq org-roam-directory "~/org/roam"))
+
+  (setq org-default-notes-file "~/org/notes.org")
+  (setq org-capture-templates
+	'(("t" "Todo" entry (file+headline "~/org/todo.org" "Inbox")
+	   "* TODO %?\n  %i")
+	  ("n" "Note" entry (file+headline "~/org/todo.org" "Inbox")
+	   "* %?\n  %i")))
+
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((R . t)))
+
+  (advice-add 'org-local-logging :override
+	      (lambda (value)
+		"Get logging settings from a property VALUE."
+		(let ((custom-split (lambda (string)
+				      (let* ((rexp "\"\\(.+?\\)\"\\|\\S-+")
+					     (start 0)
+					     (list nil))
+
+					(while (and (< start (length string))
+						    (string-match rexp string start)
+						    (>= (length string) (match-end 0)))
+					  (setq start (1+ (match-end 0)))
+					  (let* ((group (if (match-beginning 1) 1 0))
+						 (end (min (match-end group) (length string)))
+						 (this (substring string (match-beginning group) end)))
+					    (push this list)))
+					(nreverse list)))))
+		  ;; Directly set the variables, they are already local.
+		  (setq org-log-done nil
+			org-log-repeat nil
+			org-todo-log-states nil)
+		  (dolist (w (funcall custom-split value))
+		    (let (a)
+		      (cond
+		       ((setq a (assoc w org-startup-options))
+			(and (member (nth 1 a) '(org-log-done org-log-repeat))
+			     (set (nth 1 a) (nth 2 a))))
+		       ((setq a (org-extract-log-state-settings w))
+			(and (member (car a) org-todo-keywords-1)
+			     (push a org-todo-log-states)))))))))
+
+
+  (setq void/org-latex-scale 1.3)
+
+  (setq org-format-latex-options (plist-put org-format-latex-options :scale void/org-latex-scale))
+  (defun my/text-scale-adjust-latex-previews ()
+    "Adjust the size of latex preview fragments when changing the
+  buffer's text scale."
+    (pcase major-mode
+      ('latex-mode
+       (dolist (ov (overlays-in (point-min) (point-max)))
+	 (if (eq (overlay-get ov 'category)
+		 'preview-overlay)
+	     (my/text-scale--resize-fragment ov))))
+      ('org-mode
+       (dolist (ov (overlays-in (point-min) (point-max)))
+	 (if (eq (overlay-get ov 'org-overlay-type)
+		 'org-latex-overlay)
+	     (my/text-scale--resize-fragment ov))))))
+
+  (defun my/text-scale--resize-fragment (ov)
+    (overlay-put
+     ov 'display
+     (cons 'image
+	   (plist-put
+	    (cdr (overlay-get ov 'display))
+	    :scale (+ void/org-latex-scale (* 0.25 text-scale-mode-amount))))))
+
+  (add-hook 'text-scale-mode-hook #'my/text-scale-adjust-latex-previews)
+  (setq org-latex-create-formula-image-program 'dvisvgm)
+  (setq org-src-window-setup 'split-window-below)
 #+END_SRC
 
 * Keybindings
@@ -146,11 +225,6 @@
     "Open an org note"
     (interactive)
     (ido-find-file-in-dir "~/org"))
-
-  (defun void/org-capture ()
-    "Capture org note"
-    (interactive)
-    (find-file "~/org/todo.org"))
 
   (general-define-key
    :prefix "C-c"
@@ -181,7 +255,13 @@
    "r d" 'void/reload
 
    "n f" 'void/org-open
-   "n c" 'void/org-capture
+   "n n" 'org-capture
+   "n t" 'org-todo-list
+
+   "n r f" 'org-roam-node-find
+   "n r F" 'org-roam-ref-find
+   "n r s" 'org-roam-db-sync
+   "n r g" 'org-roam-graph
 
    "o t" 'treemacs)
 
