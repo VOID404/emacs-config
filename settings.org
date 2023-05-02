@@ -122,6 +122,10 @@
   (elpaca parinfer-rust-mode
     (require 'parinfer-rust-mode)
     (add-hook 'elisp-mode-hook 'parinfer-rust-mode))
+
+  (elpaca ledger-mode
+    (require 'ledger-mode)
+    (add-to-list 'auto-mode-alist '("/.hledger.journal$" . ledger-mode)))
 #+END_SRC
 
 * Org
