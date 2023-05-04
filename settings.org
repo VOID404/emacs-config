@@ -35,7 +35,11 @@
     (require 'which-key)
     (which-key-mode 1))
 
-  (elpaca vimish-fold
+  (elpaca origami
+    (require 'origami)
+    (global-origami-mode))
+
+  '(elpaca vimish-fold
     (require 'vimish-fold)
     (vimish-fold-global-mode 1))
 

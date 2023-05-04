@@ -140,7 +140,8 @@
    '("X" . meow-goto-line)
    '("y" . meow-save)
    '("Y" . meow-sync-grab)
-   '("z" . meow-pop-selection)
+   ;; '("z" . meow-pop-selection)
+   '("z" . origami-toggle-node)
    '("'" . repeat)
    '("<escape>" . ignore)))
 
