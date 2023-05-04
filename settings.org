@@ -94,12 +94,30 @@
     (dolist (m '(("\\.go$" . go-ts-mode)
 		 ("/go.mod$" . go-mod-ts-mode)
 		 ("\\.ya?ml$" . yaml-ts-mode)
-		 ("/Dockerfile" . dockerfile-ts-mode)))
+		 ("/Dockerfile" . dockerfile-ts-mode)
+		 ("\\.rs$" . rust-ts-mode)))
       (add-to-list 'auto-mode-alist m)))
 
+  (defun void/eglot-before-save ()
+    (message "[void] Formatting buffer")
+    (eglot-format-buffer))
+
+  (defun void/setup-eglot (server)
+    (message "[void] Setting up eglot rust lsp")
+    (add-to-list 'eglot-server-programs '(rust-ts-mode . ("rust-analyzer")))
+    (message "[void] Setting up eglot before save")
+    (add-hook 'before-save-hook 'void/eglot-before-save))
+
   (elpaca nil
-    (dolist (m '(go-ts-mode-hook dockerfile-ts-mode))
+    (add-hook 'eglot-connect-hook 'void/setup-eglot)
+    (dolist (m '(go-ts-mode-hook
+		 dockerfile-ts-mode-hook
+		 rust-ts-mode-hook))
       (add-hook m 'eglot-ensure)))
+
+  (elpaca flycheck-rust
+    (require 'flycheck-rust)
+    (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
 
   ;; Enable completion on tab
   (setq tab-always-indent 'complete)
@@ -248,6 +266,7 @@
    "p a" 'projectile-add-known-project
    "p d" 'projectile-remove-known-project
 
+   "c a" 'eglot-code-actions
    "c r" 'eglot-rename
    "c d" 'xref-find-definitions
    "c D" 'xref-find-references
@@ -271,7 +290,7 @@
    "n r s" 'org-roam-db-sync
    "n r g" 'org-roam-graph
 
-   "o t" 'treemacs)
+   "o p" 'treemacs)
 
   (general-define-key
    "C-s" 'consult-line)
