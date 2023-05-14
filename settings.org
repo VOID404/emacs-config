@@ -14,13 +14,13 @@
     (doom-modeline-mode 1))
 
   (elpaca dracula-theme
-    (require 'dracula-theme))
+    '(require 'dracula-theme))
 
   (elpaca base16-theme
-    (require 'base16-theme))
+    '(require 'base16-theme))
 
   (elpaca cyberpunk-theme
-    (require 'cyberpunk-theme))
+    '(require 'cyberpunk-theme))
 
   (add-to-list 'custom-theme-load-path "~/.config/emacs/themes/dracula-pro")
   (load-theme 'dracula-pro-vanhelsing t)
@@ -30,6 +30,7 @@
 #+BEGIN_SRC emacs-lisp
   (show-paren-mode)
   (electric-pair-mode)
+  (set-input-method 'polish-slash)
 
   (elpaca which-key
     (require 'which-key)
@@ -44,10 +45,10 @@
     (vimish-fold-global-mode 1))
 
   (elpaca helpful
-    (require 'helpful))
+    '(require 'helpful))
 
   (elpaca consult
-    (require 'consult))
+    '(require 'consult))
 
   (elpaca vertico
     (require 'vertico)
@@ -65,6 +66,10 @@
     (require 'projectile)
     (projectile-mode 1)
     (add-to-list 'projectile-project-root-files-bottom-up "go.mod"))
+
+  (elpaca workgroups2
+    (require 'workgroups2)
+    (workgroups-mode 1))
 #+END_SRC
 
 * Tools
@@ -88,6 +93,10 @@
 
 * Languages
 #+BEGIN_SRC emacs-lisp
+  (elpaca tree-sitter-ess-r
+    '(require 'tree-sitter-ess-r)
+    (add-hook 'ess-r-mode-hook 'tree-sitter-ess-r-using-r-faces))
+
   (elpaca treesit-auto
     (require 'treesit-auto)
     (global-treesit-auto-mode)
@@ -98,25 +107,27 @@
 		 ("\\.rs$" . rust-ts-mode)))
       (add-to-list 'auto-mode-alist m)))
 
-  (defun void/eglot-before-save ()
+  '(defun void/eglot-before-save ()
     (message "[void] Formatting buffer")
     (eglot-format-buffer))
 
-  (defun void/setup-eglot (server)
+  '(defun void/setup-eglot (server)
     (message "[void] Setting up eglot rust lsp")
     (add-to-list 'eglot-server-programs '(rust-ts-mode . ("rust-analyzer")))
     (message "[void] Setting up eglot before save")
     (add-hook 'before-save-hook 'void/eglot-before-save))
 
-  (elpaca nil
-    (add-hook 'eglot-connect-hook 'void/setup-eglot)
+  (elpaca lsp-mode
+    (setq lsp-keymap-prefix "C-c c")
     (dolist (m '(go-ts-mode-hook
 		 dockerfile-ts-mode-hook
-		 rust-ts-mode-hook))
-      (add-hook m 'eglot-ensure)))
+		 rust-ts-mode-hook
+		 c-ts-mode-hook))
+      (add-hook m 'lsp-deferred)))
+  (elpaca lsp-ui)
 
   (elpaca flycheck-rust
-    (require 'flycheck-rust)
+    '(require 'flycheck-rust)
     (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
 
   ;; Enable completion on tab
@@ -139,21 +150,21 @@
     (global-flycheck-mode))
 
   (elpaca markdown-mode
-    (require 'markdown-mode))
+    '(require 'markdown-mode))
 
   (elpaca parinfer-rust-mode
-    (require 'parinfer-rust-mode)
+    '(require 'parinfer-rust-mode)
     (add-hook 'elisp-mode-hook 'parinfer-rust-mode))
 
   (elpaca ledger-mode
-    (require 'ledger-mode)
+    '(require 'ledger-mode)
     (add-to-list 'auto-mode-alist '("/.hledger.journal$" . ledger-mode)))
 #+END_SRC
 
 * Org
 #+BEGIN_SRC emacs-lisp
   (elpaca org-roam
-    (require 'org-roam)
+    '(require 'org-roam)
     (setq org-roam-directory "~/org/roam"))
 
   (setq org-default-notes-file "~/org/notes.org")
@@ -266,10 +277,10 @@
    "p a" 'projectile-add-known-project
    "p d" 'projectile-remove-known-project
 
-   "c a" 'eglot-code-actions
-   "c r" 'eglot-rename
-   "c d" 'xref-find-definitions
-   "c D" 'xref-find-references
+   ;; "c a" 'eglot-code-actions
+   ;; "c r" 'eglot-rename
+   ;; "c d" 'xref-find-definitions
+   ;; "c D" 'xref-find-references
 
    "g g" 'magit-status
    "g b" 'magit-blame

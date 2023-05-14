@@ -1,6 +1,8 @@
 (set-foreground-color "white")
 (set-background-color "black")
 
+(setq gc-cons-threshold 2000000)
+
 (set-face-attribute 'default nil :height 120)
 (set-face-font 'default "FiraCode Nerd Font")
 
