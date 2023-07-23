@@ -1,26 +1,20 @@
 * UI
 #+BEGIN_SRC emacs-lisp
-  (elpaca all-the-icons
-    (require 'all-the-icons))
+  (use-package all-the-icons)
 
-  (elpaca doom-modeline
-    (require 'doom-modeline)
+  (use-package doom-modeline
+    :init
     (setq-default battery-mode-line-format "[%b%p%%  %t] ")
     (setq-default display-time-default-load-average nil)
     (setq-default display-time-format "%H:%M")
-
+    :config
     (display-battery-mode)
     (display-time-mode)
     (doom-modeline-mode 1))
 
-  (elpaca dracula-theme
-    '(require 'dracula-theme))
+  (use-package base16-theme)
 
-  (elpaca base16-theme
-    '(require 'base16-theme))
-
-  (elpaca cyberpunk-theme
-    '(require 'cyberpunk-theme))
+  (use-package cyberpunk-theme)
 
   (add-to-list 'custom-theme-load-path "~/.config/emacs/themes/dracula-pro")
   (load-theme 'dracula-pro-vanhelsing t)
@@ -32,79 +26,80 @@
   (electric-pair-mode)
   (set-input-method 'polish-slash)
 
-  (elpaca which-key
-    (require 'which-key)
+  (use-package which-key
+    :config
     (which-key-mode 1))
 
-  (elpaca origami
-    (require 'origami)
+  (use-package origami
+    :config
     (global-origami-mode))
 
   '(elpaca vimish-fold
     (require 'vimish-fold)
     (vimish-fold-global-mode 1))
 
-  (elpaca helpful
-    '(require 'helpful))
+  (use-package helpful)
 
-  (elpaca consult
-    '(require 'consult))
+  (use-package consult)
 
-  (elpaca vertico
-    (require 'vertico)
+  (use-package vertico
+    :config
     (vertico-mode 1))
 
-  (elpaca marginalia
-    (require 'marginalia)
+  (use-package marginalia
+    :config
     (marginalia-mode))
 
-  (elpaca orderless
-    (require 'orderless)
+  (use-package orderless
+    :init
     (setq completion-styles '(orderless)))
 
-  (elpaca projectile
-    (require 'projectile)
+  (use-package projectile
+    :config
     (projectile-mode 1)
     (add-to-list 'projectile-project-root-files-bottom-up "go.mod"))
 
-  (elpaca workgroups2
-    (require 'workgroups2)
+  (use-package workgroups2
+    :config
     (workgroups-mode 1))
 #+END_SRC
 
 * Tools
 #+BEGIN_SRC emacs-lisp
-  (elpaca magit
-    (require 'magit)
+  (use-package magit
+    :config
     (defalias 'magit-diff-visit-file 'magit-diff-visit-file-other-window)
     (transient-append-suffix 'magit-log '(0 -1) '(3 "=p" "First parent" "--first-parent")))
 
-  (elpaca treemacs
-    (require 'treemacs)
+  (use-package treemacs
+    :config
     (treemacs-follow-mode t))
 
-  (elpaca treemacs-projectile
-    (require 'treemacs-projectile))
+  (use-package treemacs-projectile)
 
-  (elpaca treemacs-magit
-    (require 'treemacs-magit))
+  (use-package treemacs-magit)
 
+  (use-package yasnippet-snippets
+    :config
+    (yas-global-mode))
 #+END_SRC
+
+#+RESULTS:
 
 * Languages
 #+BEGIN_SRC emacs-lisp
-  (elpaca tree-sitter-ess-r
-    '(require 'tree-sitter-ess-r)
+  (use-package tree-sitter-ess-r
+    :init
     (add-hook 'ess-r-mode-hook 'tree-sitter-ess-r-using-r-faces))
 
-  (elpaca treesit-auto
-    (require 'treesit-auto)
+  (use-package treesit-auto
+    :config
     (global-treesit-auto-mode)
     (dolist (m '(("\\.go$" . go-ts-mode)
-		 ("/go.mod$" . go-mod-ts-mode)
-		 ("\\.ya?ml$" . yaml-ts-mode)
-		 ("/Dockerfile" . dockerfile-ts-mode)
-		 ("\\.rs$" . rust-ts-mode)))
+  		 ("/go.mod$" . go-mod-ts-mode)
+  		 ("\\.ya?ml$" . yaml-ts-mode)
+  		 ("/Dockerfile" . dockerfile-ts-mode)
+  		 ("\\.rs$" . rust-ts-mode)))
       (add-to-list 'auto-mode-alist m)))
 
   '(defun void/eglot-before-save ()
@@ -117,25 +112,29 @@
     (message "[void] Setting up eglot before save")
     (add-hook 'before-save-hook 'void/eglot-before-save))
 
-  (elpaca lsp-mode
+  (use-package lsp-mode
+    :init
     (setq lsp-keymap-prefix "C-c c")
     (dolist (m '(go-ts-mode-hook
-		 dockerfile-ts-mode-hook
-		 rust-ts-mode-hook
-		 c-ts-mode-hook))
+  		 dockerfile-ts-mode-hook
+  		 rust-ts-mode-hook
+  		 c-ts-mode-hook
+  		 haskell-mode-hook)) 
       (add-hook m 'lsp-deferred)))
-  (elpaca lsp-ui)
 
-  (elpaca flycheck-rust
-    '(require 'flycheck-rust)
+  (use-package lsp-ui)
+
+  (use-package flycheck-rust
+    :init
     (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
 
   ;; Enable completion on tab
   (setq tab-always-indent 'complete)
 
   ;; In-buffer completion window
-  (elpaca (corfu :files (:defaults "extensions/*"))
-    (require 'corfu)
+  (use-package corfu
+    :elpaca (corfu :files (:defaults "extensions/*"))
+    :config
     (require 'corfu-popupinfo)
 
     (global-corfu-mode)
@@ -145,69 +144,76 @@
     (setq corfu-popupinfo-delay '(1.0 . 0.5))
     (add-hook 'corfu-mode-hook 'corfu-popupinfo-mode))
 
-  (elpaca flycheck
-    (require 'flycheck)
+  (use-package flycheck
+    :config
     (global-flycheck-mode))
 
-  (elpaca markdown-mode
-    '(require 'markdown-mode))
+  (use-package markdown-mode)
 
-  (elpaca parinfer-rust-mode
-    '(require 'parinfer-rust-mode)
+  (use-package parinfer-rust-mode
+    :init
     (add-hook 'elisp-mode-hook 'parinfer-rust-mode))
 
-  (elpaca ledger-mode
-    '(require 'ledger-mode)
+  (use-package ledger-mode
+    :init
     (add-to-list 'auto-mode-alist '("/.hledger.journal$" . ledger-mode)))
+
+  (use-package lsp-haskell)
+
+  (use-package haskell-mode
+    :config
+    (add-to-list 'auto-mode-alist '("\\.hs$" . haskell-mode)))
 #+END_SRC
 
 * Org
 #+BEGIN_SRC emacs-lisp
-  (elpaca org-roam
-    '(require 'org-roam)
+  (use-package org-roam
+    :init
     (setq org-roam-directory "~/org/roam"))
+
+  (use-package engrave-faces)
 
   (setq org-default-notes-file "~/org/notes.org")
   (setq org-capture-templates
-	'(("t" "Todo" entry (file+headline "~/org/todo.org" "Inbox")
-	   "* TODO %?\n  %i")
-	  ("n" "Note" entry (file+headline "~/org/todo.org" "Inbox")
-	   "* %?\n  %i")))
+  	'(("t" "Todo" entry (file+headline "~/org/todo.org" "Inbox")
+  	   "* TODO %?\n  %i")
+  	  ("n" "Note" entry (file+headline "~/org/todo.org" "Inbox")
+  	   "* %?\n  %i")))
 
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((R . t)))
 
   (advice-add 'org-local-logging :override
-	      (lambda (value)
-		"Get logging settings from a property VALUE."
-		(let ((custom-split (lambda (string)
-				      (let* ((rexp "\"\\(.+?\\)\"\\|\\S-+")
-					     (start 0)
-					     (list nil))
+  	      (lambda (value)
+  		"Get logging settings from a property VALUE."
+  		(let ((custom-split (lambda (string)
+  				      (let* ((rexp "\"\\(.+?\\)\"\\|\\S-+")
+  					     (start 0)
+  					     (list nil))
 
-					(while (and (< start (length string))
-						    (string-match rexp string start)
-						    (>= (length string) (match-end 0)))
-					  (setq start (1+ (match-end 0)))
-					  (let* ((group (if (match-beginning 1) 1 0))
-						 (end (min (match-end group) (length string)))
-						 (this (substring string (match-beginning group) end)))
-					    (push this list)))
-					(nreverse list)))))
-		  ;; Directly set the variables, they are already local.
-		  (setq org-log-done nil
-			org-log-repeat nil
-			org-todo-log-states nil)
-		  (dolist (w (funcall custom-split value))
-		    (let (a)
-		      (cond
-		       ((setq a (assoc w org-startup-options))
-			(and (member (nth 1 a) '(org-log-done org-log-repeat))
-			     (set (nth 1 a) (nth 2 a))))
-		       ((setq a (org-extract-log-state-settings w))
-			(and (member (car a) org-todo-keywords-1)
-			     (push a org-todo-log-states)))))))))
+  					(while (and (< start (length string))
+  						    (string-match rexp string start)
+  						    (>= (length string) (match-end 0)))
+  					  (setq start (1+ (match-end 0)))
+  					  (let* ((group (if (match-beginning 1) 1 0))
+  						 (end (min (match-end group) (length string)))
+  						 (this (substring string (match-beginning group) end)))
+  					    (push this list)))
+  					(nreverse list)))))
+  		  ;; Directly set the variables, they are already local.
+  		  (setq org-log-done nil
+  			org-log-repeat nil
+  			org-todo-log-states nil)
+  		  (dolist (w (funcall custom-split value))
+  		    (let (a)
+  		      (cond
+  		       ((setq a (assoc w org-startup-options))
+  			(and (member (nth 1 a) '(org-log-done org-log-repeat))
+  			     (set (nth 1 a) (nth 2 a))))
+  		       ((setq a (org-extract-log-state-settings w))
+  			(and (member (car a) org-todo-keywords-1)
+  			     (push a org-todo-log-states)))))))))
 
 
   (setq void/org-latex-scale 1.3)
@@ -219,22 +225,22 @@
     (pcase major-mode
       ('latex-mode
        (dolist (ov (overlays-in (point-min) (point-max)))
-	 (if (eq (overlay-get ov 'category)
-		 'preview-overlay)
-	     (my/text-scale--resize-fragment ov))))
+  	 (if (eq (overlay-get ov 'category)
+  		 'preview-overlay)
+  	     (my/text-scale--resize-fragment ov))))
       ('org-mode
        (dolist (ov (overlays-in (point-min) (point-max)))
-	 (if (eq (overlay-get ov 'org-overlay-type)
-		 'org-latex-overlay)
-	     (my/text-scale--resize-fragment ov))))))
+  	 (if (eq (overlay-get ov 'org-overlay-type)
+  		 'org-latex-overlay)
+  	     (my/text-scale--resize-fragment ov))))))
 
   (defun my/text-scale--resize-fragment (ov)
     (overlay-put
      ov 'display
      (cons 'image
-	   (plist-put
-	    (cdr (overlay-get ov 'display))
-	    :scale (+ void/org-latex-scale (* 0.25 text-scale-mode-amount))))))
+  	   (plist-put
+  	    (cdr (overlay-get ov 'display))
+  	    :scale (+ void/org-latex-scale (* 0.25 text-scale-mode-amount))))))
 
   (add-hook 'text-scale-mode-hook #'my/text-scale-adjust-latex-previews)
   (setq org-latex-create-formula-image-program 'dvisvgm)
