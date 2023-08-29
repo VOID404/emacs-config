@@ -1,3 +1,7 @@
+#+BEGIN_SRC emacs-lisp
+  (general-auto-unbind-keys)
+#+END_SRC
+  
 * UI
 #+BEGIN_SRC emacs-lisp
   (use-package all-the-icons)
@@ -11,6 +15,16 @@
     (display-battery-mode)
     (display-time-mode)
     (doom-modeline-mode 1))
+
+  (use-package centaur-tabs
+    :config
+    (centaur-tabs-mode t)
+    (setq centaur-tabs-set-bar 'under)
+    (setq x-underline-at-descent-line t)
+    (setq centaur-tabs-style "wave")
+    :bind
+    ("C-c <left>" . centaur-tabs-backward)
+    ("C-c <right>" . centaur-tabs-forward))
 
   (use-package base16-theme)
 
@@ -68,8 +82,7 @@
 #+BEGIN_SRC emacs-lisp
   (use-package magit
     :config
-    (defalias 'magit-diff-visit-file 'magit-diff-visit-file-other-window)
-    (transient-append-suffix 'magit-log '(0 -1) '(3 "=p" "First parent" "--first-parent")))
+    (defalias 'magit-diff-visit-file 'magit-diff-visit-file-other-window))
 
   (use-package treemacs
     :config
@@ -88,6 +101,8 @@
 
 * Languages
 #+BEGIN_SRC emacs-lisp
+  (use-package tree-sitter-langs)
+
   (use-package tree-sitter-ess-r
     :init
     (add-hook 'ess-r-mode-hook 'tree-sitter-ess-r-using-r-faces))
@@ -96,31 +111,38 @@
     :config
     (global-treesit-auto-mode)
     (dolist (m '(("\\.go$" . go-ts-mode)
-  		 ("/go.mod$" . go-mod-ts-mode)
-  		 ("\\.ya?ml$" . yaml-ts-mode)
-  		 ("/Dockerfile" . dockerfile-ts-mode)
-  		 ("\\.rs$" . rust-ts-mode)))
+    	       ("/go.mod$" . go-mod-ts-mode)
+    	       ("\\.ya?ml$" . yaml-ts-mode)
+    	       ("/Dockerfile" . dockerfile-ts-mode)
+    	       ("\\.rs$" . rust-ts-mode)))
       (add-to-list 'auto-mode-alist m)))
 
   '(defun void/eglot-before-save ()
-    (message "[void] Formatting buffer")
-    (eglot-format-buffer))
+     (message "[void] Formatting buffer")
+     (eglot-format-buffer))
 
   '(defun void/setup-eglot (server)
-    (message "[void] Setting up eglot rust lsp")
-    (add-to-list 'eglot-server-programs '(rust-ts-mode . ("rust-analyzer")))
-    (message "[void] Setting up eglot before save")
-    (add-hook 'before-save-hook 'void/eglot-before-save))
+     (message "[void] Setting up eglot rust lsp")
+     (add-to-list 'eglot-server-programs '(rust-ts-mode . ("rust-analyzer")))
+     (message "[void] Setting up eglot before save")
+     (add-hook 'before-save-hook 'void/eglot-before-save))
+
+  (defun void/setup-lsp ()
+    (add-hook 'before-save-hook (lambda () (lsp-format-buffer))))
 
   (use-package lsp-mode
     :init
-    (setq lsp-keymap-prefix "C-c c")
+    ;; (setq lsp-keymap-prefix "SPC c")
     (dolist (m '(go-ts-mode-hook
-  		 dockerfile-ts-mode-hook
-  		 rust-ts-mode-hook
-  		 c-ts-mode-hook
-  		 haskell-mode-hook)) 
-      (add-hook m 'lsp-deferred)))
+    	       dockerfile-ts-mode-hook
+    	       rust-ts-mode-hook
+    	       c-ts-mode-hook
+    	       haskell-mode-hook)) 
+      (add-hook m 'lsp-deferred))
+    :config
+    (general-def 'normal lsp-mode :definer 'minor-mode
+      "SPC c" lsp-command-map)
+    :hook (lsp-mode . void/setup-lsp))
 
   (use-package lsp-ui)
 
@@ -162,7 +184,19 @@
 
   (use-package haskell-mode
     :config
+    (custom-set-variables '(haskell-process-type 'stack-ghci))
     (add-to-list 'auto-mode-alist '("\\.hs$" . haskell-mode)))
+
+  (use-package shakespeare-mode
+    :mode (("\\.hamlet\\'" . shakespeare-hamlet-mode)
+  	 ("\\.lucius\\'" . shakespeare-lucius-mode)
+  	 ("\\.julius\\'" . shakespeare-julius-mode)))
+
+  (use-package graphql-mode
+    :mode "\\.g(raph)?ql")
+
+  (use-package restclient
+    :mode "\\.http\\'")
 #+END_SRC
 
 * Org
@@ -172,6 +206,17 @@
     (setq org-roam-directory "~/org/roam"))
 
   (use-package engrave-faces)
+
+
+  (setq org-todo-keywords '((sequence "[_](t!)"
+  				    "[?](f!)"
+  				    "[VERIFY](v!)"
+  				    "[WAIT](w@/!)"
+  				    "|" "[X](d!)" "[CANCELED](c!)" "[NMP](n@)"))
+        org-todo-keyword-faces '(("[_]" . (:foreground "green"))
+  			       ("[?]" . warning)
+  			       ("[X]" . (:foreground "green"))
+  			       ("[CANCELED]" . (:strike-through t :foreground "red"))))
 
   (setq org-default-notes-file "~/org/notes.org")
   (setq org-capture-templates
@@ -270,15 +315,19 @@
     (ido-find-file-in-dir "~/org"))
 
   (general-define-key
-   :prefix "C-c"
+   :states '(normal visual insert emacs motion)
+   :prefix "SPC"
+   :non-normal-prefix "M-SPC"
 
    "SPC" 'consult-buffer
    "/" 'void/ripgrep
 
+   "f" '(:ignore t :which-key "files")
    "f f" 'find-file
    "f p" 'projectile-find-file
    "f d" 'void/dotfile
 
+   "p" '(:ignore t :which-key "projects")
    "p p" 'projectile-switch-project
    "p a" 'projectile-add-known-project
    "p d" 'projectile-remove-known-project
@@ -288,10 +337,12 @@
    ;; "c d" 'xref-find-definitions
    ;; "c D" 'xref-find-references
 
-   "g g" 'magit-status
+   "g" '(:ignore t :which-key "git")
+   "g g" 'magit
    "g b" 'magit-blame
    "g c" 'magit-checkout
 
+   "b" '(:ignore t :which-key "buffer")
    "b r" 'revert-buffer-quick
    "b d" 'kill-current-buffer
    "b b" 'consult-buffer
@@ -307,8 +358,11 @@
    "n r s" 'org-roam-db-sync
    "n r g" 'org-roam-graph
 
-   "o p" 'treemacs)
+   "o p" 'treemacs
+
+   "w =" 'balance-windows)
 
   (general-define-key
    "C-s" 'consult-line)
+  (general-auto-unbind-keys t)
 #+END_SRC
