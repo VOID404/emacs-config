@@ -112,9 +112,10 @@
     (global-treesit-auto-mode)
     (dolist (m '(("\\.go$" . go-ts-mode)
     	       ("/go.mod$" . go-mod-ts-mode)
-    	       ("\\.ya?ml$" . yaml-ts-mode)
-    	       ("/Dockerfile" . dockerfile-ts-mode)
-    	       ("\\.rs$" . rust-ts-mode)))
+  	       ("\\.ya?ml$" . yaml-ts-mode)
+  	       ("/Dockerfile" . dockerfile-ts-mode)
+  	       ("\\.rs$" . rust-ts-mode)
+  	       ("\\.ts$" . typescript-ts-mode)))
       (add-to-list 'auto-mode-alist m)))
 
   '(defun void/eglot-before-save ()
@@ -130,6 +131,15 @@
   (defun void/setup-lsp ()
     (add-hook 'before-save-hook (lambda () (lsp-format-buffer))))
 
+  (defun void/zig-test-buffer ()
+    (interactive)
+    (zig--run-cmd "test" (file-local-name (buffer-file-name)) "-O" zig-test-optimization-mode "--main-pkg-path" (concat (projectile-project-root) "src")))
+
+  (use-package zig-mode
+    :mode "\\.zig\\'"
+    :bind (:map zig-mode-map
+  			  ("C-c C-t" . void/zig-test-buffer)))
+
   (use-package lsp-mode
     :init
     ;; (setq lsp-keymap-prefix "SPC c")
@@ -137,12 +147,18 @@
     	       dockerfile-ts-mode-hook
     	       rust-ts-mode-hook
     	       c-ts-mode-hook
-    	       haskell-mode-hook)) 
+  	       typescript-ts-mode-hook
+  	       web-mode-hook
+    	       haskell-mode-hook
+  	       zig-mode-hook)) 
       (add-hook m 'lsp-deferred))
     :config
     (general-def 'normal lsp-mode :definer 'minor-mode
       "SPC c" lsp-command-map)
     :hook (lsp-mode . void/setup-lsp))
+
+  (use-package web-mode
+    :mode ("\\.svelte$" "\\.html$"))
 
   (use-package lsp-ui)
 
