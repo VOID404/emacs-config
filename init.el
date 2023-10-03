@@ -3,6 +3,9 @@
 (set-foreground-color "white")
 (set-background-color "black")
 
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(load-file custom-file)
+
 (setq gc-cons-threshold 2000000)
 
 (set-face-attribute 'default nil :height 120)
@@ -53,8 +56,6 @@
 
 ;; Block until current queue processed.
 (elpaca-wait)
-
-(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 
 (org-babel-load-file
  (expand-file-name "settings.org" user-emacs-directory))
