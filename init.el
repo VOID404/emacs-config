@@ -50,10 +50,6 @@
   (require 'evil)
   (evil-mode 1))
 
-(elpaca evil-collection
-  (require 'evil-collection)
-  (evil-collection-init))
-
 ;; Block until current queue processed.
 (elpaca-wait)
 
