@@ -30,8 +30,8 @@
 
   (use-package cyberpunk-theme)
 
-  (add-to-list 'custom-theme-load-path "~/.config/emacs/themes/dracula-pro")
-  (load-theme 'dracula-pro-vanhelsing t)
+  ;(add-to-list 'custom-theme-load-path "~/.config/emacs/themes/dracula-pro")
+  (load-theme 'cyberpunk t)
 #+END_SRC
 
 * Behaviour
@@ -171,7 +171,7 @@
 
   ;; In-buffer completion window
   (use-package corfu
-    :elpaca (corfu :files (:defaults "extensions/*"))
+    ;; :elpaca (corfu :files (:defaults "extensions/*"))
     :config
     (require 'corfu-popupinfo)
 
