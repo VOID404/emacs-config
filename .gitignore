@@ -1,6 +1,4 @@
 *
 !.gitignore
 !init.el
-!settings.org
-!elpaca.el
 !README.org
